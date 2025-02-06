@@ -1,8 +1,20 @@
 import asyncio
 import aiohttp
 
-async def main():
+import argparse
+
+async def handle_reddit():
     
+    
+    return
+    
+async def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--reddit")
+    args = parser.parse_args()
+    
+    if (args.reddit):
+        handle_reddit()
     
     return
 
