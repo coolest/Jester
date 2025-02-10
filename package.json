@@ -1,15 +1,15 @@
 {
-  "name": "jester",
+  "name": "dreary-leadership-wonder-s1dle",
+  "productName": "dreary-leadership-wonder-s1dle",
+  "description": "My Electron application description",
+  "keywords": [],
+  "main": "./app/main.js",
   "version": "1.0.0",
-  "description": "Sentiment Analysis Bot",
-  "main": "main.js",
+  "author": "gcmoc",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron . "
+    "start": "electron ."
   },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
-    "electron": "^34.1.0"
+    "electron": "34.1.0"
   }
 }
