@@ -3,13 +3,13 @@
   "productName": "dreary-leadership-wonder-s1dle",
   "description": "My Electron application description",
   "keywords": [],
-  "main": "./app/main.js",
+  "main": "src/main/index.js",
   "version": "1.0.0",
   "author": "gcmoc",
   "scripts": {
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "34.1.0"
+    "electron": "^34.1.1"
   }
 }

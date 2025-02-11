@@ -1,10 +1,11 @@
 
 const {app, BrowserWindow, screen } = require('electron/main')
+const path = require('path')
 
 const createWindow = () => {
-  const {widht, height} = screen.getPrimaryDisplay().workAreaSize;
+  const {width, height} = screen.getPrimaryDisplay().workAreaSize;
   const win = new BrowserWindow({
-    maxWidth: widht,
+    maxWidth: width,
     maxHeight: height,
     
     backgroundColor: '#15141b',
@@ -17,7 +18,7 @@ const createWindow = () => {
     }
   })
 
-  win.loadFile('./app/index.html')
+  win.loadFile(path.join(__dirname, 'index.html'))
 }
 
 app.whenReady().then(() => {
