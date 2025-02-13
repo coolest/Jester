@@ -1,0 +1,12 @@
+@import '@renderer/assets/index.css';
+
+.NavBar {
+    height: 35px;
+    background-color: var(--background-color);
+    color: var(--white-soft);
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    -webkit-app-region: drag;
+}
+

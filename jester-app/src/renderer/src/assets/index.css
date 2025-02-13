@@ -30,7 +30,7 @@
   --white-soft: #bdbdbd;
   --gray-soft: #6d6d6d;
   --purple-soft: #8464c6;
-  --purple-fading-soft: #3d375e7f;
+  --purple-fading-soft: #534c807f;
   --green-soft: #54c59f;
   --orange-soft: #c7a06f;
   --pink-soft: #c17ac8;
@@ -67,7 +67,7 @@ ul {
 
 body {
   min-height: 100vh;
-  color: var(--color-text);
+  color: var(--white);
   background: var(--background-soft-color);
   line-height: 1.6;
   font-family:
@@ -87,3 +87,20 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.Wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+
+.Container {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: row;
+  border-top: 1px solid var(--deep-black);
+}
+

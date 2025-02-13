@@ -1,8 +1,9 @@
-import '@renderer/assets/components/Main.css'
+import '@renderer/assets/components/main/header/NavBar.css'
 
 export const NavBar = () => {
-    return (
-        <header className="NavBar">
-        </header>
-    )
+  return (
+    <header className="NavBar">
+      <div className="Image" />
+    </header>
+  )
 }

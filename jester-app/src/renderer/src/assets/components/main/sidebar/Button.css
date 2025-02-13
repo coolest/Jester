@@ -1,0 +1,16 @@
+@import '@renderer/assets/index.css';
+
+
+.Button {
+    height: 70px;
+    flex-shrink: 0;
+    color: var(--white-soft);
+    background-color: var(--background-soft-color);
+    border-radius: 10px;
+    border: none;
+    margin-bottom: 10px;
+}
+
+.Button:hover {
+    background-color: var(--selection-color);
+}

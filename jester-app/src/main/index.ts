@@ -1,5 +1,5 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
 
@@ -16,14 +16,13 @@ function createWindow(): void {
     autoHideMenuBar: true,
     center: true,
     titleBarStyle: 'hidden',
-    trafficLightPosition: {x: 10, y: 10},
-    ...(process.platform === 'linux' ? { icon } : {}),
+    trafficLightPosition: { x: 10, y: 10 },
+    ...(process.platform !== 'darwin' ? { icon } : {}),
     ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
     titleBarOverlay: {
       color: '#100f14',
       symbolColor: '#bdbdbd',
-      height: 35,
-      
+      height: 35
     },
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -63,9 +62,6 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
 
   createWindow()
 

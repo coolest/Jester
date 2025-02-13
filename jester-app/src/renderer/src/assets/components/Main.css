@@ -1,29 +1,14 @@
 @import '../index.css';
 
-.Container {
-    flex: 1;
-    height: (100vh - 25px);
-    width: 100vw;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-.NavBar {
-    height: 35px;
-    width: 100vw;
-    background-color: var(--background-color);
+.Button {
+    height: 70px;
+    flex-shrink: 0;
     color: var(--white-soft);
-    padding: 10px;
-    display: flex;
-    justify-content: center;
-    app-region: drag;
+    background-color: var(--background-soft-color);
+    border-radius: 10px;
+    border: none;
 }
 
-.SideBar {
-    width: 120px;
-    height: 100vh;
-    background-color: var(--background-color);
-    overflow: hidden;
-    display: flex;
+.Button:hover {
+    background-color: var(--selection-color);
 }
