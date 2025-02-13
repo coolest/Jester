@@ -1,0 +1,29 @@
+@import '../index.css';
+
+.Container {
+    flex: 1;
+    height: (100vh - 25px);
+    width: 100vw;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.NavBar {
+    height: 35px;
+    width: 100vw;
+    background-color: var(--background-color);
+    color: var(--white-soft);
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    app-region: drag;
+}
+
+.SideBar {
+    width: 120px;
+    height: 100vh;
+    background-color: var(--background-color);
+    overflow: hidden;
+    display: flex;
+}

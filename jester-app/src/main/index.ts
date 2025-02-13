@@ -1,6 +1,6 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
 import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 function createWindow(): void {
@@ -8,9 +8,23 @@ function createWindow(): void {
   const mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
+
+    minWidth: 600,
+    minHeight: 447,
+
     show: false,
     autoHideMenuBar: true,
+    center: true,
+    titleBarStyle: 'hidden',
+    trafficLightPosition: {x: 10, y: 10},
     ...(process.platform === 'linux' ? { icon } : {}),
+    ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
+    titleBarOverlay: {
+      color: '#100f14',
+      symbolColor: '#bdbdbd',
+      height: 35,
+      
+    },
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: true,
