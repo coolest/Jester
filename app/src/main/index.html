@@ -1,22 +1,135 @@
-
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <meta
-      http-equiv="X-Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <link href="./styles.css" rel="stylesheet">
-  </head>
-  <body>
-    <div class = "titlebar">  Hello from Electron renderer <div>
-    
-    <p>👋</p>
-  </body>
+<head>
+    <title>Crypto Tracker</title>
+    <link rel="stylesheet" href="../styles/crypto.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-chart-line"></i> Crypto Tracker
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="nav-link active" data-page="add-crypto">
+                <i class="fas fa-plus-circle"></i> Add Crypto
+            </a></li>
+            <li><a href="#" class="nav-link" data-page="dashboard">
+                <i class="fas fa-chart-bar"></i> Dashboard
+            </a></li>
+            <li><a href="#" class="nav-link" data-page="compare">
+                <i class="fas fa-balance-scale"></i> Compare
+            </a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Add Crypto Page -->
+        <div class="page active" id="add-crypto-page">
+            <h1><i class="fas fa-plus-circle"></i> Add New Crypto</h1>
+            <div id="crypto-form" class="form-container">
+                <form id="addCryptoForm">
+                    <div class="form-group">
+                        <label for="cryptoName"><i class="fas fa-coins"></i> Crypto Name:</label>
+                        <input type="text" id="cryptoName" required placeholder="e.g., Bitcoin">
+                    </div>
+                    <div class="form-group">
+                        <label for="subreddit"><i class="fab fa-reddit"></i> Subreddit:</label>
+                        <input type="text" id="subreddit" required placeholder="e.g., bitcoin">
+                    </div>
+                    <div class="form-group">
+                        <label for="twitterHashtag"><i class="fab fa-twitter"></i> Twitter Hashtag:</label>
+                        <input type="text" id="twitterHashtag" required placeholder="e.g., #bitcoin">
+                    </div>
+                    <div class="form-group">
+                        <label for="youtubeQuery"><i class="fab fa-youtube"></i> YouTube Query:</label>
+                        <input type="text" id="youtubeQuery" required placeholder="e.g., bitcoin news">
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Save & Search
+                    </button>
+                </form>
+            </div>
+            <div id="crypto-list" class="list-container">
+                <h2><i class="fas fa-list"></i> Saved Cryptos (<span id="cryptoCount">0</span>/10)</h2>
+                <button onclick="verifyStorage()" class="btn-verify">
+                    <i class="fas fa-check-circle"></i> Verify Storage
+                </button>
+                <div id="storageInfo" class="storage-info"></div>
+                <div id="cryptoEntries"></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div class="page" id="dashboard-page">
+            <h1><i class="fas fa-chart-bar"></i> Crypto Dashboard</h1>
+            <div class="dashboard-container">
+                <div class="crypto-selector">
+                    <select id="dashboardCryptoSelect" class="crypto-select">
+                        <option value="">Select a Crypto</option>
+                    </select>
+                </div>
+                <div class="dashboard-grid">
+                    <div class="dashboard-card reddit-card">
+                        <h3><i class="fab fa-reddit"></i> Reddit Activity</h3>
+                        <div id="redditContent" class="card-content">
+                            Select a crypto to view Reddit activity
+                        </div>
+                    </div>
+                    <div class="dashboard-card twitter-card">
+                        <h3><i class="fab fa-twitter"></i> Twitter Mentions</h3>
+                        <div id="twitterContent" class="card-content">
+                            Select a crypto to view Twitter mentions
+                        </div>
+                    </div>
+                    <div class="dashboard-card youtube-card">
+                        <h3><i class="fab fa-youtube"></i> YouTube Content</h3>
+                        <div id="youtubeContent" class="card-content">
+                            Select a crypto to view YouTube content
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compare Page -->
+        <div class="page" id="compare-page">
+            <h1><i class="fas fa-balance-scale"></i> Compare Cryptos</h1>
+            <div class="compare-container">
+                <div class="compare-selectors">
+                    <div class="selector-group">
+                        <label for="crypto1">First Crypto:</label>
+                        <select id="crypto1" class="crypto-select">
+                            <option value="">Select Crypto</option>
+                        </select>
+                    </div>
+                    <div class="selector-group">
+                        <label for="crypto2">Second Crypto:</label>
+                        <select id="crypto2" class="crypto-select">
+                            <option value="">Select Crypto</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="compareButton" class="btn-primary">
+                    <i class="fas fa-sync"></i> Compare
+                </button>
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h3>Reddit Activity Comparison</h3>
+                        <div id="redditComparison" class="comparison-content"></div>
+                    </div>
+                    <div class="comparison-card">
+                        <h3>Twitter Mentions Comparison</h3>
+                        <div id="twitterComparison" class="comparison-content"></div>
+                    </div>
+                    <div class="comparison-card">
+                        <h3>YouTube Content Comparison</h3>
+                        <div id="youtubeComparison" class="comparison-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../renderer/renderer.js"></script>
+</body>
 </html>

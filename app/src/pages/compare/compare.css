@@ -1,0 +1,159 @@
+.compare-container {
+    padding: 20px;
+}
+
+.compare-selectors {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.selector-group {
+    flex: 1;
+}
+
+.comparison-vs {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #3498db;
+    padding: 20px;
+    text-align: center;
+}
+
+.selector-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    color: #fff;
+}
+
+.crypto-select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.07);
+    color: #fff;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.crypto-select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+#compareButton {
+    width: 100%;
+    margin-bottom: 30px;
+    padding: 15px;
+    font-size: 1.1em;
+}
+
+.comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.comparison-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comparison-card h3 {
+    color: #3498db;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.comparison-content {
+    min-height: 200px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.overall-comparison {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 20px;
+}
+
+.comparison-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comparison-row:last-child {
+    border-bottom: none;
+}
+
+.crypto-column {
+    text-align: center;
+}
+
+.crypto-column h4 {
+    color: #3498db;
+    margin-bottom: 10px;
+}
+
+.metric-label {
+    color: #aaa;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+}
+
+.metric-value {
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.winner {
+    color: #2ecc71;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #888;
+}
+
+.loading i {
+    font-size: 2em;
+    margin-bottom: 10px;
+    color: #3498db;
+}
+
+.placeholder-text {
+    color: #888;
+    text-align: center;
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .compare-selectors {
+        flex-direction: column;
+    }
+    
+    .comparison-vs {
+        padding: 10px;
+    }
+    
+    .comparison-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}

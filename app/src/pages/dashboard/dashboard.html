@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - Crypto Tracker</title>
+    <link rel="stylesheet" href="../../styles/crypto.css">
+    <link rel="stylesheet" href="../../styles/nav.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        function navigate(page) {
+            console.log('Navigation called:', page);
+            ipcRenderer.send('navigate', page);
+        }
+    </script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-chart-line"></i> Crypto Tracker
+        </div>
+        <ul class="nav-links">
+            <li><a class="nav-link" onclick="navigate('addCrypto')">
+                <i class="fas fa-plus-circle"></i> Add Crypto
+            </a></li>
+            <li><a class="nav-link active" onclick="navigate('dashboard')">
+                <i class="fas fa-chart-bar"></i> Dashboard
+            </a></li>
+            <li><a class="nav-link" onclick="navigate('compare')">
+                <i class="fas fa-balance-scale"></i> Compare
+            </a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1><i class="fas fa-chart-bar"></i> Crypto Dashboard</h1>
+        
+        <div class="dashboard-container">
+            <div class="crypto-selector">
+                <label for="dashboardCryptoSelect">Select Crypto:</label>
+                <select id="dashboardCryptoSelect" class="crypto-select">
+                    <option value="">Select a Crypto</option>
+                </select>
+            </div>
+
+            <div class="stats-overview">
+                <div class="stat-card total-mentions">
+                    <i class="fas fa-comments"></i>
+                    <span class="stat-value" id="totalMentions">0</span>
+                    <span class="stat-label">Total Mentions</span>
+                </div>
+                <div class="stat-card engagement-rate">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="stat-value" id="engagementRate">0%</span>
+                    <span class="stat-label">Engagement Rate</span>
+                </div>
+                <div class="stat-card sentiment-score">
+                    <i class="fas fa-smile"></i>
+                    <span class="stat-value" id="sentimentScore">N/A</span>
+                    <span class="stat-label">Sentiment Score</span>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dashboard-card reddit-card">
+                    <h3><i class="fab fa-reddit"></i> Reddit Activity</h3>
+                    <div id="redditContent" class="card-content">
+                        <p class="placeholder-text">Select a crypto to view Reddit activity</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-card twitter-card">
+                    <h3><i class="fab fa-twitter"></i> Twitter Mentions</h3>
+                    <div id="twitterContent" class="card-content">
+                        <p class="placeholder-text">Select a crypto to view Twitter mentions</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-card youtube-card">
+                    <h3><i class="fab fa-youtube"></i> YouTube Content</h3>
+                    <div id="youtubeContent" class="card-content">
+                        <p class="placeholder-text">Select a crypto to view YouTube content</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../utils/storage.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

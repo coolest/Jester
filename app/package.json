@@ -1,15 +1,15 @@
 {
-  "name": "dreary-leadership-wonder-s1dle",
-  "productName": "dreary-leadership-wonder-s1dle",
-  "description": "My Electron application description",
-  "keywords": [],
-  "main": "src/main/index.js",
+  "name": "crypto-tracker",
   "version": "1.0.0",
-  "author": "gcmoc",
+  "description": "Crypto tracking application",
+  "main": "src/main/index.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
-    "electron": "^34.1.1"
+    "electron": "^28.0.0"
   }
 }

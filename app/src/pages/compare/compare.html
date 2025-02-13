@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Compare Cryptos - Crypto Tracker</title>
+    <link rel="stylesheet" href="../../styles/crypto.css">
+    <link rel="stylesheet" href="../../styles/nav.css">
+    <link rel="stylesheet" href="compare.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        function navigate(page) {
+            console.log('Navigation called:', page);
+            ipcRenderer.send('navigate', page);
+        }
+    </script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-chart-line"></i> Crypto Tracker
+        </div>
+        <ul class="nav-links">
+            <li><a class="nav-link" onclick="navigate('addCrypto')">
+                <i class="fas fa-plus-circle"></i> Add Crypto
+            </a></li>
+            <li><a class="nav-link" onclick="navigate('dashboard')">
+                <i class="fas fa-chart-bar"></i> Dashboard
+            </a></li>
+            <li><a class="nav-link active" onclick="navigate('compare')">
+                <i class="fas fa-balance-scale"></i> Compare
+            </a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1><i class="fas fa-balance-scale"></i> Compare Cryptos</h1>
+        
+        <div class="compare-container">
+            <div class="compare-selectors">
+                <div class="selector-group">
+                    <label for="crypto1">First Crypto:</label>
+                    <select id="crypto1" class="crypto-select">
+                        <option value="">Select Crypto</option>
+                    </select>
+                </div>
+                <div class="comparison-vs">VS</div>
+                <div class="selector-group">
+                    <label for="crypto2">Second Crypto:</label>
+                    <select id="crypto2" class="crypto-select">
+                        <option value="">Select Crypto</option>
+                    </select>
+                </div>
+            </div>
+
+            <button id="compareButton" class="btn-primary">
+                <i class="fas fa-sync"></i> Compare
+            </button>
+
+            <div id="comparisonResults" class="comparison-results">
+                <div class="comparison-grid">
+                    <div class="comparison-card">
+                        <h3><i class="fab fa-reddit"></i> Reddit Comparison</h3>
+                        <div id="redditComparison" class="comparison-content">
+                            <p class="placeholder-text">Select two cryptos to compare Reddit activity</p>
+                        </div>
+                    </div>
+
+                    <div class="comparison-card">
+                        <h3><i class="fab fa-twitter"></i> Twitter Comparison</h3>
+                        <div id="twitterComparison" class="comparison-content">
+                            <p class="placeholder-text">Select two cryptos to compare Twitter activity</p>
+                        </div>
+                    </div>
+
+                    <div class="comparison-card">
+                        <h3><i class="fab fa-youtube"></i> YouTube Comparison</h3>
+                        <div id="youtubeComparison" class="comparison-content">
+                            <p class="placeholder-text">Select two cryptos to compare YouTube activity</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overall-comparison">
+                    <h3><i class="fas fa-chart-pie"></i> Overall Analysis</h3>
+                    <div id="overallComparison" class="comparison-content">
+                        <p class="placeholder-text">Select two cryptos to see overall analysis</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../utils/storage.js"></script>
+    <script src="compare.js"></script>
+</body>
+</html>
