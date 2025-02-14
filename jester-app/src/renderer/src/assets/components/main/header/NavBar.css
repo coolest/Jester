@@ -2,11 +2,18 @@
 
 .NavBar {
     height: 35px;
-    background-color: var(--background-color);
+    background-color: var(--black);
     color: var(--white-soft);
-    padding: 10px;
     display: flex;
     justify-content: center;
+    align-content: center;
     -webkit-app-region: drag;
+}
+
+.Image {
+    width: 24px;
+    height: 24px;
+    margin: auto;
+    margin-left: 15px;   
 }
 

@@ -1,9 +1,9 @@
 import '@renderer/assets/components/main/header/NavBar.css'
-
-export const NavBar = () => {
+import logo from '@renderer/assets/images/icon.png'
+export const NavBar: React.FC = () => {
   return (
     <header className="NavBar">
-      <div className="Image" />
+      <img src={logo} className="Image" />
     </header>
   )
 }

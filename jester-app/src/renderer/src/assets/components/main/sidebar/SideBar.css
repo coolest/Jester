@@ -4,8 +4,8 @@
 .SideBar {
     width: 250px;
     display: flex;
-    background: linear-gradient(to bottom, var(--purple-fading), 10%, var(--background-color));
     overflow-y: auto;
+    background-color: var(--black);
     border-right: 1px solid var(--deep-black);
     flex-direction: column;
     padding: 10px;
@@ -25,8 +25,7 @@
     background: var(--purple-fading); 
     border-radius: 50px;
   }
-  
-  /* Handle on hover */
+
 .SideBar::-webkit-scrollbar-thumb:hover {
-    background: var(--purple-fading-soft)
-  }
+  background: var(--purple-fading-soft); 
+}

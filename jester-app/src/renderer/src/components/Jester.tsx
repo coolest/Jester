@@ -1,7 +1,5 @@
-import { Main } from "./main"
+import { Main } from './main'
 
-export const Jester = () => {
-    return (
-        <Main />
-    )
+export const Jester: React.FC = () => {
+  return <Main />
 }

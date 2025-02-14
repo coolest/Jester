@@ -5,12 +5,31 @@
     height: 70px;
     flex-shrink: 0;
     color: var(--white-soft);
-    background-color: var(--background-soft-color);
+    background-color: var(--black-softer);
     border-radius: 10px;
     border: none;
     margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    overflow: hidden;
+    font-size: xx-large;
+    align-items: center;  
+    padding-left: 10px;
+    transition: color .5s ease-in-out;  
 }
 
 .Button:hover {
     background-color: var(--selection-color);
 }
+
+.Score {
+    justify-self: flex-end;
+    margin-left: auto;
+    padding-right: 10px;
+
+}
+
+
+

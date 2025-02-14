@@ -27,6 +27,7 @@
   
   --deep-black: #000000;
   --black-soft: #15141b;
+  --black-softer: #211f29;
   --white-soft: #bdbdbd;
   --gray-soft: #6d6d6d;
   --purple-soft: #8464c6;
@@ -35,7 +36,7 @@
   --orange-soft: #c7a06f;
   --pink-soft: #c17ac8;
   --blue-soft: #6cb2c7;
-  --red-soft: #c55858;
+  --red-soft: rgb(197, 88, 88);
 
   --background-soft-color: var(--black-soft);  
   --foreground-soft-color: var(--white-soft);
@@ -102,5 +103,19 @@ body {
   display: flex;
   flex-direction: row;
   border-top: 1px solid var(--deep-black);
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+    
 }
 
