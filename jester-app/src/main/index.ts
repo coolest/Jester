@@ -1,7 +1,44 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, shell, ipcMain} from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
+
+let storedCryptos: any[] = [] // In a real app, this would be a database
+
+ipcMain.handle('add-crypto', async (_event, cryptoData) => {
+  console.log('Main process received add-crypto request')
+  console.log('Received data:', cryptoData)
+  try {
+    // Create new crypto object
+    const newCrypto = {
+      id: Date.now().toString(),
+      ...cryptoData,
+      createdAt: new Date().toISOString()
+    }
+    console.log('Created new crypto object:', newCrypto)
+
+    // Add to storage
+    storedCryptos.push(newCrypto)
+    console.log('Current stored cryptos:', storedCryptos)
+
+    // Return success
+    return { success: true, data: newCrypto }
+  } catch (error) {
+    console.error('Error in add-crypto handler:', error)
+    console.error('Full error details:', error)
+    throw error
+  }
+})
+
+ipcMain.handle('get-cryptos', () => {
+  console.log('Returning stored cryptos:', storedCryptos)
+  return storedCryptos
+})
+
+ipcMain.handle('delete-crypto', (_event, id) => {
+  storedCryptos = storedCryptos.filter(crypto => crypto.id !== id)
+  return { success: true }
+})
 
 function createWindow(): void {
   // Create the browser window.
@@ -26,8 +63,9 @@ function createWindow(): void {
     },
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: true,
-      contextIsolation: true
+      sandbox: false,
+      contextIsolation: true,
+      nodeIntegration: false
     }
   })
 
