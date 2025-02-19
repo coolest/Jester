@@ -5,8 +5,8 @@
     width: 250px;
     display: flex;
     overflow-y: auto;
-    background-color: var(--black);
-    border-right: 1px solid var(--deep-black);
+    background-color: var(--background-soft-color);
+    border-right: 1px solid var(--background-color);
     flex-direction: column;
     padding: 10px;
 }

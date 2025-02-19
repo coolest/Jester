@@ -18,6 +18,7 @@
     align-items: center;  
     padding-left: 10px;
     transition: color .5s ease-in-out;  
+    cursor: pointer
 }
 
 .Button:hover {
@@ -28,6 +29,7 @@
     justify-self: flex-end;
     margin-left: auto;
     padding-right: 10px;
+    font-weight: bold;
 
 }
 
