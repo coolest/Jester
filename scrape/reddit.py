@@ -116,8 +116,8 @@ async def handle_reddit(reddit_name, start_timestamp, end_timestamp):
         raise ValueError("Missing required Reddit API credentials in environment variables")
     
     # Make sure it is a clean division between days
-    if (end_timestamp - start_timestamp) % ONE_DAY != 0:
-        raise ValueError("The timestamps provided are not X number days apart")
+    if (end_timestamp - start_timestamp) % ONE_DAY != 0 or (start_timestamp % ONE_DAY) != 0 or start_timestamp < end_timestamp:
+        raise ValueError("The timestamps provided are not X number days apart or invalid (not start of a day, or end_timestamp is before start_timestamp")
     
     try: 
         reddit = asyncpraw.Reddit(
