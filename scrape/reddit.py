@@ -10,12 +10,9 @@ from asyncprawcore.exceptions import AsyncPrawcoreException  # Async-specific co
 
 from collections import defaultdict
 from datetime import datetime, UTC
-from dotenv import load_dotenv
 
-# https://stackoverflow.com/questions/64734118/environment-variable-not-loading-with-load-dotenv-in-linux
-load_dotenv(override = True) # Doesn't work without override = True
-DEBUG_MODE = os.getenv("DEBUG_MODE") == "1"
-ONE_DAY = 86400
+# Constants etc that multiple files will use
+from config import *
 
 def format_timestamp(timestamp):
     return "[" + datetime.fromtimestamp(timestamp, UTC).strftime('%Y-%m-%d %H:%M:%S') + "]"
