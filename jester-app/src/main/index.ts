@@ -1,7 +1,84 @@
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, shell, ipcMain} from 'electron'
 import { join } from 'path'
 import icon from '../../resources/icon.png?asset'
+
+// Define the type for our crypto data
+interface CryptoData {
+  id: string
+  cryptoName: string
+  videoLink: string
+  subreddit: string
+  hashtag: string
+  score: number
+  img?: string
+  createdAt: string
+}
+
+// We'll initialize the store after import
+let store: any
+
+// Initialize store using async IIFE
+(async () => {
+  const { default: ElectronStore } = await import('electron-store')
+  store = new ElectronStore({
+    name: 'crypto-data',
+    defaults: {
+      cryptos: []
+    }
+  })
+})()
+
+ipcMain.handle('add-crypto', async (_event, cryptoData) => {
+  console.log('Main process received add-crypto request')
+  try {
+    if (!store) {
+      throw new Error('Store not initialized')
+    }
+
+    const newCrypto: CryptoData = {
+      id: Date.now().toString(),
+      ...cryptoData,
+      createdAt: new Date().toISOString()
+    }
+
+    const currentCryptos = store.get('cryptos') || []
+    currentCryptos.push(newCrypto)
+    store.set('cryptos', currentCryptos)
+
+    return { success: true, data: newCrypto }
+  } catch (error) {
+    console.error('Error in add-crypto handler:', error)
+    throw error
+  }
+})
+
+ipcMain.handle('get-cryptos', () => {
+  try {
+    if (!store) {
+      throw new Error('Store not initialized')
+    }
+    return store.get('cryptos') || []
+  } catch (error) {
+    console.error('Error getting cryptos:', error)
+    return []
+  }
+})
+
+ipcMain.handle('delete-crypto', (_event, id: string) => {
+  try {
+    if (!store) {
+      throw new Error('Store not initialized')
+    }
+    const currentCryptos = store.get('cryptos') || []
+    const updatedCryptos = currentCryptos.filter(crypto => crypto.id !== id)
+    store.set('cryptos', updatedCryptos)
+    return { success: true }
+  } catch (error) {
+    console.error('Error deleting crypto:', error)
+    throw error
+  }
+})
 
 function createWindow(): void {
   // Create the browser window.
@@ -26,8 +103,9 @@ function createWindow(): void {
     },
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: true,
-      contextIsolation: true
+      sandbox: false,
+      contextIsolation: true,
+      nodeIntegration: false
     }
   })
 
@@ -52,13 +130,19 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  // Set app user model id for windows
+app.whenReady().then(async () => {
+  // Initialize store first
+  const { default: ElectronStore } = await import('electron-store')
+  store = new ElectronStore({
+    name: 'crypto-data',
+    defaults: {
+      cryptos: []
+    }
+  })
+
+  // Then continue with the rest
   electronApp.setAppUserModelId('com.electron')
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
@@ -66,8 +150,6 @@ app.whenReady().then(() => {
   createWindow()
 
   app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 })
