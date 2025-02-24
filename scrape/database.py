@@ -33,7 +33,6 @@ def get_cached(platform: Platform, source, start_ts, end_ts):
         
     return cached_values
     
-    
 def cache_values(platform: Platform, source, sentiment_mapping):
     for (day_ts, sentiment) in sentiment_mapping.items():
         try:
@@ -50,3 +49,19 @@ def cache_values(platform: Platform, source, sentiment_mapping):
      
     return
         
+def save_posts(platform: Platform, source, post_sentiment_mapping):
+    # post_sentiment_mapping = { (post_id, sentiment) }
+    for (post, sentiment) in post_sentiment_mapping.items():
+        try:
+            db.collection(platform.value + TEST)\
+                .docuemnt(source)\
+                .collection("posts")\
+                .document(post)\
+                .set({
+                    'timestamp': post,
+                    'score': sentiment
+                })
+        except Exception as e:
+            print(f"Error when writing to firebase with {platform.value}/{source}/sentiments/{day_ts}: {e}")
+     
+    return
