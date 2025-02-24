@@ -9,7 +9,8 @@ from asyncpraw.exceptions import APIException, ClientException
 from asyncprawcore.exceptions import AsyncPrawcoreException  # Async-specific core exceptions
 
 from collections import defaultdict
-from datetime import datetime, UTC
+import datetime
+import pytz
 
 # Constants etc that multiple files will use
 from config import *
@@ -17,6 +18,12 @@ from config import *
 def format_timestamp(timestamp):
     return "[" + datetime.fromtimestamp(timestamp, UTC).strftime('%Y-%m-%d %H:%M:%S') + "]"
     
+def is_start_of_day(timestamp):
+    dt_object_utc = datetime.datetime.fromtimestamp(timestamp, tz=pytz.utc)
+    
+    return dt_object_utc.hour == 0 and dt_object_utc.minute == 0 and dt_object_utc.second == 0 and dt_object_utc.microsecond == 0
+
+
 async def safely_fetch_comments(submission, max_retries=5):
     for attempt in range(max_retries + 1):
         try:
@@ -115,8 +122,8 @@ async def handle_reddit(reddit_name, start_timestamp, end_timestamp):
     if not all([client_id, client_secret, client_username, client_password]):
         raise ValueError("Missing required Reddit API credentials in environment variables")
     
-    # Make sure it is a clean division between days
-    if (end_timestamp - start_timestamp) % ONE_DAY != 0 or (start_timestamp % ONE_DAY) != 0 or start_timestamp < end_timestamp:
+    # Make sure it is a clean division between days, if start_timestamp is at the start of UTC day so is end_timestamp
+    if (end_timestamp - start_timestamp) % ONE_DAY != 0 or not is_start_of_day(start_timestamp) or start_timestamp > end_timestamp:
         raise ValueError("The timestamps provided are not X number days apart or invalid (not start of a day, or end_timestamp is before start_timestamp")
     
     try: 
