@@ -11,18 +11,18 @@ from asyncprawcore.exceptions import AsyncPrawcoreException  # Async-specific co
 from collections import defaultdict
 import datetime
 import pytz
+import database
 
 # Constants etc that multiple files will use
 from config import *
 
 def format_timestamp(timestamp):
-    return "[" + datetime.fromtimestamp(timestamp, UTC).strftime('%Y-%m-%d %H:%M:%S') + "]"
+    return "[" + datetime.fromtimestamp(timestamp, datetime.UTC).strftime('%Y-%m-%d %H:%M:%S') + "]"
     
 def is_start_of_day(timestamp):
     dt_object_utc = datetime.datetime.fromtimestamp(timestamp, tz=pytz.utc)
     
     return dt_object_utc.hour == 0 and dt_object_utc.minute == 0 and dt_object_utc.second == 0 and dt_object_utc.microsecond == 0
-
 
 async def safely_fetch_comments(submission, max_retries=5):
     for attempt in range(max_retries + 1):
@@ -139,10 +139,23 @@ async def handle_reddit(reddit_name, start_timestamp, end_timestamp):
         subreddit = await reddit.subreddit(reddit_name, fetch=True) # Get the subreddit, make sure we fetch, not create
         submissions_by_day = await process_submissions(subreddit, start_timestamp, end_timestamp) # Dictionary to store submissions by day 
         
+        # IT'S OK TO FETCH ALL SUBMISSIONS THEN CHECK CACHE TO SEE IF I NEED COMMENTS...
+        # If I have a cache of [-1, cache1, cache2, cache3, -1, -1, -1, -1],
+        # I would still need to backtrack behind the cached values ANYWAYS to get the oldest day cache... plus submission count is usually low compared to comments
+        cache_by_day = database.get_cached(Platform.REDDIT, subreddit, start_timestamp, end_timestamp) # Timestamps are already validated... database shouldn't need to validate...
+        
         # Expand to get ALL posts/comments/etc
-        posts_by_day = defaultdict(list) 
+        posts_by_day = defaultdict(list)
+        
+        # Answers
+        sentiment_by_day = defaultdict(int)
         
         for day, submissions in submissions_by_day.items():
+            if (cache_by_day[day] > 0): # Don't need to fetch comments
+                sentiment_by_day[day] = cache_by_day[day]
+                
+                continue
+            
             for submission in submissions:
                 # Re-append submission
                 posts_by_day[day].append(submission)
@@ -166,6 +179,21 @@ async def handle_reddit(reddit_name, start_timestamp, end_timestamp):
         for _, posts in posts_by_day.items():
             for post in posts:
                 post_id_mapping[post.fullname] = post
+        
+        # Do sentiment analysis here
+        for day, posts in posts_by_day.items():
+            parents = list()
+            current_parent_id = post.parent_id
+
+            while current_parent_id in post_id_mapping:
+                parent_post = post_id_mapping[current_parent_id]
+                parents.append(parent_post)
+                
+                current_parent_id = getattr(parent_post, 'parent_id', None)
+                
+            # Query the sentiment analysis
+            sentiment = 1
+            sentiment_by_day[day] = sentiment
         
         # See if we got the submissions correctly
         if DEBUG_MODE:
@@ -196,11 +224,15 @@ async def handle_reddit(reddit_name, start_timestamp, end_timestamp):
                         print("POST: ", post.fullname)
                 print("")
                 
+        # Or print JSON formatted version
+        return sentiment_by_day
+                
     except Exception as e:
         print(f"Top level error on the reddit scraper shown as {e}")
         
     finally:
         await reddit.close()
+        
         if DEBUG_MODE:
             print("REDDIT CLOSED SUCCESSFULLY.")
     
