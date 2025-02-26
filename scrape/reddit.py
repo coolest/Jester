@@ -17,7 +17,7 @@ import database
 from config import *
 
 def format_timestamp(timestamp):
-    return "[" + datetime.fromtimestamp(timestamp, datetime.UTC).strftime('%Y-%m-%d %H:%M:%S') + "]"
+    return "[" + datetime.datetime.fromtimestamp(timestamp, datetime.UTC).strftime('%Y-%m-%d %H:%M:%S') + "]"
     
 def is_start_of_day(timestamp):
     dt_object_utc = datetime.datetime.fromtimestamp(timestamp, tz=pytz.utc)
@@ -142,17 +142,26 @@ async def handle_reddit(reddit_name, start_timestamp, end_timestamp):
         # IT'S OK TO FETCH ALL SUBMISSIONS THEN CHECK CACHE TO SEE IF I NEED COMMENTS...
         # If I have a cache of [-1, cache1, cache2, cache3, -1, -1, -1, -1],
         # I would still need to backtrack behind the cached values ANYWAYS to get the oldest day cache... plus submission count is usually low compared to comments
-        cache_by_day = database.get_cached(Platform.REDDIT, subreddit, start_timestamp, end_timestamp) # Timestamps are already validated... database shouldn't need to validate...
+        if DEBUG_MODE:
+            print("QUERYING DATABASE CACHE", end=' ')
+            
+        cache_by_day = await database.get_cached(Platform.REDDIT, reddit_name, start_timestamp, end_timestamp) # Timestamps are already validated... database shouldn't need to validate...
+        
+        if DEBUG_MODE:
+            print("[FINISHED]")
         
         # Expand to get ALL posts/comments/etc
         posts_by_day = defaultdict(list)
         
         # Answers
         sentiment_by_day = defaultdict(int)
-        
+            
         for day, submissions in submissions_by_day.items():
             if (cache_by_day[day] > 0): # Don't need to fetch comments
                 sentiment_by_day[day] = cache_by_day[day]
+                
+                if DEBUG_MODE:
+                    print(f"C[{day}] ", end=' ')
                 
                 continue
             
@@ -171,8 +180,12 @@ async def handle_reddit(reddit_name, start_timestamp, end_timestamp):
                     # Append comment in the posts dictionary
                     comment_day_start = (comment_ts - start_timestamp) // ONE_DAY
                     posts_by_day[start_timestamp + ONE_DAY * comment_day_start].append(comment)
+                    
+            if DEBUG_MODE:
+                print(f"F[{day}]", end = ' ')
             
         if DEBUG_MODE:
+            print()
             print("FINISHED FETCHING [ALL] COMMENTS")
                 
         post_id_mapping = defaultdict()
@@ -180,21 +193,40 @@ async def handle_reddit(reddit_name, start_timestamp, end_timestamp):
             for post in posts:
                 post_id_mapping[post.fullname] = post
         
+        posts_sentiment = defaultdict()
+        
         # Do sentiment analysis here
         for day, posts in posts_by_day.items():
-            parents = list()
-            current_parent_id = post.parent_id
+            for post in posts:
+                parents = list()
+                current_parent_id = getattr(post, 'parent_id', None)
 
-            while current_parent_id in post_id_mapping:
-                parent_post = post_id_mapping[current_parent_id]
-                parents.append(parent_post)
+                while current_parent_id in post_id_mapping:
+                    parent_post = post_id_mapping[current_parent_id]
+                    parents.append(parent_post)
+                    
+                    current_parent_id = getattr(parent_post, 'parent_id', None)
+                    
+                # Query the sentiment analysis
+                sentiment = 1
+                sentiment_by_day[day] = sentiment
                 
-                current_parent_id = getattr(parent_post, 'parent_id', None)
-                
-            # Query the sentiment analysis
-            sentiment = 1
-            sentiment_by_day[day] = sentiment
+                # Store in dictionary for saving in firebase
+                posts_sentiment[post.fullname] = sentiment
         
+        # Save to database
+        if DEBUG_MODE:
+            print("SAVING TO DATABASE", end = ' ')
+            
+        tasks = []
+        tasks.append(database.save_posts(Platform.REDDIT, reddit_name, posts_sentiment))
+        tasks.append(database.cache_values(Platform.REDDIT, reddit_name, sentiment_by_day))
+        await asyncio.gather(*tasks) # Block until the data has been saved...
+        
+        if DEBUG_MODE:
+            print("[FINISHED]")
+            print() # Now print submissions/comments found
+            
         # See if we got the submissions correctly
         if DEBUG_MODE:
             for day, submissions in submissions_by_day.items():
@@ -223,7 +255,7 @@ async def handle_reddit(reddit_name, start_timestamp, end_timestamp):
                             print(parent_post.fullname, end=" ")
                         print("POST: ", post.fullname)
                 print("")
-                
+        
         # Or print JSON formatted version
         return sentiment_by_day
                 
