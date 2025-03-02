@@ -5,7 +5,8 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   addCrypto: (cryptoData: any) => ipcRenderer.invoke('add-crypto', cryptoData),
   getCryptos: () => ipcRenderer.invoke('get-cryptos'),
-  deleteCrypto: (id: string) => ipcRenderer.invoke('delete-crypto', id)
+  deleteCrypto: (id: string) => ipcRenderer.invoke('delete-crypto', id),
+  updateCrypto: (id, cryptoData) => ipcRenderer.invoke('update-crypto', id, cryptoData)
 }
 console.log('Preload script running')
 console.log('API being exposed:', api)

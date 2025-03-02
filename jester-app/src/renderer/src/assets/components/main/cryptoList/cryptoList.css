@@ -1,33 +1,87 @@
 .crypto-list {
+  width: 90%;
+  max-width: 800px;
+  margin: 20px 0 40px;
+  padding: 30px;
+  background-color: var(--background-soft-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--background-color);
+  box-sizing: border-box;
+}
+
+.crypto-item {
+  background-color: var(--background-color);
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.crypto-item h3 {
+  margin: 0 0 15px 0;
+  color: var(--text-color);
+  font-size: 1.2rem;
+}
+
+.crypto-item p {
+  margin: 5px 0;
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.crypto-item button {
+  background-color: var(--purple-fading);
+  color: white;
+  border: none;
+  padding: 12px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+}
+
+.crypto-item button:hover {
+  background-color: var(--purple-fading-soft);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .crypto-list {
+    width: 95%;
     padding: 20px;
   }
-  
-  .crypto-item {
-    background: #333;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-  }
-  
-  .crypto-item h3 {
-    margin: 0 0 10px 0;
-    color: #fff;
-  }
-  
-  .crypto-item p {
-    margin: 5px 0;
-    color: #ccc;
-  }
-  
-  .crypto-item button {
-    background: #ff4444;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 3px;
-    cursor: pointer;
-  }
-  
-  .crypto-item button:hover {
-    background: #ff0000;
-  }
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.button-group button {
+  background-color: var(--purple-fading);
+  color: white;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  flex: 1;
+  transition: background-color 0.3s;
+}
+
+.button-group button:hover {
+  background-color: var(--purple-fading-soft);
+}
+
+.button-group button[type="button"] {
+  background-color: var(--background-color);
+  border: 1px solid var(--purple-fading);
+  color: var(--text-color);
+}
+
+.button-group button[type="button"]:hover {
+  background-color: rgba(var(--purple-fading-rgb), 0.1);
+}

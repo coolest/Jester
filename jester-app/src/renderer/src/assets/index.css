@@ -89,6 +89,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* Prevent body from having its own scrollbar */
+}
+
 .Wrapper {
   display: flex;
   flex-direction: column;
@@ -99,7 +105,7 @@ body {
 
 .Container {
   flex: 1;
-  overflow: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: row;
   border-top: 1px solid var(--deep-black);
@@ -119,3 +125,33 @@ body {
     
 }
 
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Prevents cutting off content */
+  width: 100%;
+  min-height: 100vh; /* Full viewport height */
+  overflow-y: auto; /* Allows scrolling if needed */
+  padding: 20px 0; /* Adds spacing to prevent cutoff */
+}
+
+.content::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+.content::-webkit-scrollbar-track {
+  background: #00000000;
+}
+
+/* Handle */
+.content::-webkit-scrollbar-thumb {
+  background: var(--purple-fading);
+  border-radius: 50px;
+}
+
+/* Handle on hover */
+.content::-webkit-scrollbar-thumb:hover {
+  background: var(--purple-fading-soft);
+}

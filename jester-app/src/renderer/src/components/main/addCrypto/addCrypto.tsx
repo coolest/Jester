@@ -55,38 +55,56 @@ const AddCrypto: React.FC<AddCryptoProps> = ({ onAdd }) => {
       console.error('Error in handleSubmit:', error)
       console.error('Full error details:', error)
     }
- }
+  }
 
   return (
-    <div>
-      <h2>Add Cryptocurrency</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={cryptoData.cryptoName}
-          onChange={(e) => setCryptoData({ ...cryptoData, cryptoName: e.target.value })}
-          placeholder="Crypto ID (e.g., BTC)"
-        />
-        <input
-          type="text"
-          value={cryptoData.videoLink}
-          onChange={(e) => setCryptoData({ ...cryptoData, videoLink: e.target.value })}
-          placeholder="Youtube Video Link"
-        />
-        <input
-          type="text"
-          value={cryptoData.subreddit}
-          onChange={(e) => setCryptoData({ ...cryptoData, subreddit: e.target.value })}
-          placeholder="Subreddit"
-        />
-        <input
-          type="text"
-          value={cryptoData.hashtag}
-          onChange={(e) => setCryptoData({ ...cryptoData, hashtag: e.target.value })}
-          placeholder="Twitter(X) Hashtag"
-        />
-        <button type="submit">Add</button>
-      </form>
+    <div className="content-wrapper">
+      <div className="add-crypto-container">
+        <h2 className="add-crypto-title">Add Cryptocurrency</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="cryptoName">Cryptocurrency ID</label>
+            <input
+              id="cryptoName"
+              type="text"
+              value={cryptoData.cryptoName}
+              onChange={(e) => setCryptoData({ ...cryptoData, cryptoName: e.target.value })}
+              placeholder="Crypto ID (e.g., BTC)"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="videoLink">YouTube Video Link</label>
+            <input
+              id="videoLink"
+              type="text"
+              value={cryptoData.videoLink}
+              onChange={(e) => setCryptoData({ ...cryptoData, videoLink: e.target.value })}
+              placeholder="Youtube Video Link"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="subreddit">Subreddit</label>
+            <input
+              id="subreddit"
+              type="text"
+              value={cryptoData.subreddit}
+              onChange={(e) => setCryptoData({ ...cryptoData, subreddit: e.target.value })}
+              placeholder="Subreddit"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="hashtag">Twitter(X) Hashtag</label>
+            <input
+              id="hashtag"
+              type="text"
+              value={cryptoData.hashtag}
+              onChange={(e) => setCryptoData({ ...cryptoData, hashtag: e.target.value })}
+              placeholder="Twitter(X) Hashtag"
+            />
+          </div>
+          <button type="submit" className="submit-button">Add Cryptocurrency</button>
+        </form>
+      </div>
     </div>
   )
 }

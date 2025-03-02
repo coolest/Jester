@@ -1,34 +1,145 @@
+.content-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+
 .add-crypto-container {
+  padding: 30px;
+  width: 90%;
+  max-width: 800px;
+  margin: 20px 0 40px;
+  background-color: var(--background-soft-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--background-color);
+  box-sizing: border-box;
+}
+
+.add-crypto-title {
+  text-align: center;
+  margin-bottom: 25px;
+  color: var(--text-color);
+}
+
+.form-layout {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+}
+
+.form-column {
+  flex: 3;
+}
+
+.measurement-column {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.measurement-container {
+  background-color: var(--background-color);
+  border-radius: 6px;
+  padding: 20px;
+  height: 100%;
+}
+
+.measurement-title {
+  margin-bottom: 20px;
+  color: var(--text-color);
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.metric-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.metric-label {
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.metric-value {
+  color: var(--purple-fading);
+  font-weight: 600;
+}
+
+.metric-info {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: var(--text-color);
+  opacity: 0.7;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--background-color);
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.3s;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.form-group input:focus {
+  border-color: var(--purple-fading);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--purple-fading-soft);
+}
+
+.submit-button {
+  background-color: var(--purple-fading);
+  color: white;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+  background-color: var(--purple-fading-soft);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .form-layout {
+    flex-direction: column;
+  }
+  
+  .measurement-container {
+    margin-top: 20px;
+  }
+  
+  .add-crypto-container {
+    width: 95%;
     padding: 20px;
-    max-width: 500px;
-    margin: 0 auto;
   }
-  
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-  }
-  
-  .form-group input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  
-  button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #45a049;
-  }
+}
