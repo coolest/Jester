@@ -11,7 +11,11 @@ interface Crypto {
   img?: string;
 }
 
-const CryptoList: React.FC = () => {
+interface CryptoListProps {
+  onDelete?: () => void;
+}
+
+const CryptoList: React.FC<CryptoListProps> = ({ onDelete }) => {
   const [cryptos, setCryptos] = useState<Crypto[]>([]);
   const [editingCrypto, setEditingCrypto] = useState<Crypto | null>(null);
   const [formData, setFormData] = useState<Omit<Crypto, 'id'>>({
@@ -36,6 +40,11 @@ const CryptoList: React.FC = () => {
     try {
       await window.api.deleteCrypto(id);
       await loadCryptos();
+      
+      // Call the onDelete callback to update the sidebar
+      if (onDelete) {
+        onDelete();
+      }
     } catch (error) {
       console.error('Error deleting crypto:', error);
     }
@@ -75,6 +84,12 @@ const CryptoList: React.FC = () => {
       });
       
       await loadCryptos();
+      
+      // Call the onDelete callback to update the sidebar after edit
+      if (onDelete) {
+        onDelete();
+      }
+      
       setEditingCrypto(null);
       setFormData({
         cryptoName: '',
@@ -171,7 +186,6 @@ const CryptoList: React.FC = () => {
           <p>Subreddit: r/{crypto.subreddit}</p>
           <p>Twitter Hashtag: {crypto.hashtag}</p>
           <p>YouTube Link: {crypto.videoLink}</p>
-          {/* Only show action buttons if no crypto is being edited or if this crypto is not the one being edited */}
           {!editingCrypto || editingCrypto.id !== crypto.id ? (
             <div className="crypto-actions">
               <button onClick={() => handleEdit(crypto)} className="edit-button">Edit</button>
