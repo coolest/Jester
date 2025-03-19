@@ -13,7 +13,7 @@ interface Color {
   b: number
 }
 
-export const Button: React.FC<ButtonProp> = ({ tag, score, img }) => {
+export const Button: React.FC<ButtonProp> = ({ tag, score}) => {
   // Skip rendering the button if the score is out of bounds
   if (score > 50 || score < -50) return null
 
@@ -36,7 +36,7 @@ export const Button: React.FC<ButtonProp> = ({ tag, score, img }) => {
       onMouseLeave={() => setIsHovered(false)} // Reset on hover end // Apply dynamic text color
     >
       {/* <img src={img || 'default-image.png'} /> // Provide alt text for accessibility */}
-      <div>{tag}</div>
+      <div className="tag-container">{tag}</div>
       <div
         className="Score"
         style={{
