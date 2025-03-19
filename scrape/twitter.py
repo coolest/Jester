@@ -66,7 +66,7 @@ async def process_tweets(api, hashtag, start_timestamp, end_timestamp):
     # If timespan if >7 days then chances are v1.1 doesn't have it :(
     days_difference = (end_date - start_date).days
     if days_difference > 7:
-        print(f"Warning: Twitter API v1.1 standard search only supports up to 7 days in the past. Results may be incomplete.")
+        print(f"Warning: Twitter API search only supports up to 7 days in the past")
     
     try:
         search_query = f"#{hashtag}"
@@ -285,7 +285,11 @@ async def main():
     if (not args.start or not args.end or not args.hashtag):
         return
     
-    await handle_twitter(args.hashtag, int(args.start), int(args.end))
+    
+    # Don't have access to API
+    # Print template result here..
+    
+    # await handle_twitter(args.hashtag, int(args.start), int(args.end))
 
 if __name__ == "__main__":
     asyncio.run(main())

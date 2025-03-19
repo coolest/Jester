@@ -3,3 +3,4 @@
 # for MAC, but similar process for other OS
 
  python3 scrape/reddit.py --reddit ethtrader --end 1738454400 --start 1738368000
+ python3 scrape/twitter.py --hashtag ETH --start 1741564800 --end 1741651200
