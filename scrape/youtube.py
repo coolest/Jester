@@ -292,7 +292,7 @@ async def handle_youtube(channel_or_search, start_timestamp=None, end_timestamp=
                             parents.append(parent_post)
                             current_parent_id = parent_post.get('parent_id')
                         
-                        print(f"CONTEXT: {comments_to_post[comment['fullname']]} ", end="")
+                        print(f"CONTEXT: {comments_to_post[post['fullname']]} ", end="")
                         for parent_post in reversed(parents):
                             print(parent_post['fullname'], end=" ")
                         print(f"POST: {post['fullname']} - {post['text']}")
