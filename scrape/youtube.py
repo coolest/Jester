@@ -7,6 +7,7 @@ from collections import defaultdict
 import datetime
 import pytz
 import database
+
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
@@ -199,6 +200,7 @@ async def handle_youtube(channel_or_search, start_timestamp=None, end_timestamp=
         
         posts_by_day = defaultdict(list)
         sentiment_by_day = defaultdict(int)
+        comments_to_post = defaultdict()
         
         for day, videos in videos_by_day.items():
             if cache_by_day[day] > 0:
@@ -219,6 +221,8 @@ async def handle_youtube(channel_or_search, start_timestamp=None, end_timestamp=
                         comment_ts = comment['created_utc']
                         if end_timestamp and comment_ts > end_timestamp:
                             continue
+                        
+                        comments_to_post[comment['fullname']] = video['fullname']
                         
                         if start_timestamp:
                             comment_day_start = (comment_ts - start_timestamp) // ONE_DAY
@@ -288,10 +292,10 @@ async def handle_youtube(channel_or_search, start_timestamp=None, end_timestamp=
                             parents.append(parent_post)
                             current_parent_id = parent_post.get('parent_id')
                         
-                        print(f"CONTEXT: ", end="")
+                        print(f"CONTEXT: {comments_to_post[comment['fullname']]} ", end="")
                         for parent_post in reversed(parents):
                             print(parent_post['fullname'], end=" ")
-                        print(f"POST: {post['fullname']} - {post['text'][:50]}...")
+                        print(f"POST: {post['fullname']} - {post['text']}")
                 print("")
         
         return sentiment_by_day
