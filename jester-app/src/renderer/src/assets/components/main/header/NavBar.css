@@ -1,54 +1,91 @@
-@import '@renderer/assets/index.css';
-
-.NavBar {
-    height: 35px;
-    background-color: var(--black);
-    color: var(--white-soft);
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    -webkit-app-region: drag;
-    user-select: none;
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding: 0 20px;
+  background-color: var(--background-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  border-bottom: 1px solid var(--background-soft-color);
 }
 
-.Image {
-    width: 24px;
-    height: 24px;
-    margin: auto;
-    margin-left: 15px;   
-    float: left;
+.navbar-logo h1 {
+  font-size: 1.5rem;
+  color: var(--text-color);
+  margin: 0;
+  font-weight: 600;
 }
 
-.SearchBar {
-    color: var(--gray);
-    margin: auto;
-    margin-left: -39px;
-    height: 70%;
-    width: 40%;
-    max-width: 500px;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    background-color: var(--background-soft-color);
-    border-radius: 6px;
-    padding: 2px;
-    padding-right: 10px;
-    padding-left: 10px;
-    border: 1px solid var(--purple-fading);
-    font-size: small;
-    -webkit-app-region: no-drag; 
-    cursor: pointer
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.SearchBar:hover {
-    background-color: var(--black); 
-    border-color: var(--purple); 
+.navbar-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  color: var(--text-color);
+  gap: 8px;
 }
 
-.SearchImage {
-    width: 12px;
-    height: 12px;
-    margin-top: auto;
-    margin-bottom: auto;
-    margin-right: 4px;
+.navbar-item:hover {
+  background-color: var(--background-soft-color);
+  color: var(--text-color);
+}
+
+.navbar-item.active {
+  background-color: var(--purple-fading);
+  color: white;
+  font-weight: 500;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 100px; /* Add spacing to prevent overlap with window controls */
+}
+
+.window-control-spacer {
+  width: 20px; /* Additional spacer */
+}
+
+.navbar-item.notification,
+.navbar-item.help {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  padding: 0;
+}
+
+.navbar-item.notification:hover,
+.navbar-item.help:hover {
+  background-color: var(--background-soft-color);
+}
+
+@media (max-width: 768px) {
+  .navbar-item span {
+    display: none;
+  }
+  
+  .navbar-menu {
+    gap: 5px;
+  }
+  
+  .navbar-item {
+    padding: 8px;
+  }
 }

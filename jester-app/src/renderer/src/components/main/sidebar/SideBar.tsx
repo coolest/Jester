@@ -1,23 +1,45 @@
-import '@renderer/assets/components/main/sidebar/SideBar.css'
-import React from 'react'
-import { Button } from './Button'
+import React from 'react';
+import { Button } from './Button';
+import '@renderer/assets/components/main/sidebar/SideBar.css';
 
-interface DummyProp {
-  id: string
-  score: number
-  img?: string // Optional property
+// Match the interface from the Main component
+interface SidebarItem {
+  id: string;
+  tag: string;
+  score: number;
+  img?: string;
 }
 
 interface SideBarProps {
-  data: DummyProp[]
+  data: SidebarItem[];
+  onItemClick?: (id: string) => void;
 }
 
-export const SideBar: React.FC<SideBarProps> = ({ data }) => {
+export const SideBar: React.FC<SideBarProps> = ({ data, onItemClick }) => {
+  const handleClick = (id: string) => {
+    if (onItemClick) {
+      onItemClick(id);
+    }
+  };
+
   return (
-    <aside className="SideBar">
-      {data.map((dummyProp, index) => (
-        <Button key={index} tag={dummyProp.id} score={dummyProp.score} img={dummyProp.img} />
-      ))}
-    </aside>
-  )
-}
+    <div className="sidebar">
+      <h1>Cryptos</h1>
+      <div className="sidebar-content">
+        {data.map((item, index) => (
+          <div 
+            key={index}
+            className="button-wrapper" 
+            onClick={() => handleClick(item.id)}
+          >
+            <Button
+              tag={item.tag}
+              score={item.score}
+              img={item.img}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};

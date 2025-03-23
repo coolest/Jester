@@ -1,6 +1,5 @@
 @import '@renderer/assets/index.css';
 
-
 .Button {
     height: 70px;
     flex-shrink: 0;
@@ -18,20 +17,27 @@
     align-items: center;  
     padding-left: 10px;
     transition: color .5s ease-in-out;  
-    cursor: pointer
+    cursor: pointer;
+    justify-content: space-between; /* Ensures proper spacing between elements */
 }
 
 .Button:hover {
     background-color: var(--selection-color);
 }
 
+.tag-container {
+    text-align: left;
+    padding-right: 15px; /* Add padding to create space between name and score */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Add ellipsis for long names */
+    white-space: nowrap; /* Keep names on a single line */
+    max-width: 70%; /* Ensure tag doesn't push score off-screen */
+}
+
 .Score {
-    justify-self: flex-end;
     margin-left: auto;
     padding-right: 10px;
     font-weight: bold;
-
+    min-width: 50px; /* Ensure score has minimum width */
+    text-align: right;
 }
-
-
-

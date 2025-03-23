@@ -1,0 +1,243 @@
+.settings-container {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.settings-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: var(--text-color);
+}
+
+.statistics-badge {
+  background-color: var(--purple-fading);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.save-status-message {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.settings-section {
+  width: 100%;
+  margin: 20px 0 24px;
+  padding: 30px;
+  background-color: var(--background-soft-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--background-color);
+}
+
+.settings-section h3 {
+  font-size: 18px;
+  color: var(--text-color);
+  margin: 0 0 20px 0;
+  font-weight: 500;
+}
+
+.setting-group {
+  margin-bottom: 20px;
+  background-color: var(--background-color);
+  padding: 20px;
+  border-radius: 6px;
+}
+
+.setting-group:last-child {
+  margin-bottom: 0;
+}
+
+.setting-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.setting-group select,
+.setting-group input[type="text"],
+.setting-group input[type="password"],
+.setting-group input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--background-soft-color);
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+.setting-group input[type="number"] {
+  width: 120px;
+}
+
+.setting-description {
+  font-size: 13px;
+  color: var(--text-color);
+  opacity: 0.7;
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+.setting-group.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.setting-group.checkbox label {
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.sub-setting {
+  margin-left: 26px;
+  margin-bottom: 15px;
+  padding-top: 8px;
+}
+
+.api-key-display {
+  display: flex;
+  gap: 8px;
+}
+
+.api-key-display input {
+  flex: 1;
+  font-family: monospace;
+}
+
+.toggle-visibility {
+  background-color: var(--background-soft-color);
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-color);
+  white-space: nowrap;
+  transition: background-color 0.3s;
+}
+
+.toggle-visibility:hover {
+  background-color: rgba(var(--purple-fading-rgb), 0.1);
+}
+
+.generate-key-button {
+  background-color: var(--purple-fading);
+  border: none;
+  border-radius: 6px;
+  padding: 12px 15px;
+  cursor: pointer;
+  font-size: 14px;
+  color: white;
+  margin-top: 12px;
+  transition: background-color 0.3s;
+}
+
+.generate-key-button:hover {
+  background-color: var(--purple-fading-soft);
+}
+
+.settings-actions {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.save-button {
+  flex: 1;
+  background-color: var(--purple-fading);
+  border: none;
+  border-radius: 6px;
+  padding: 12px 15px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.save-button:hover {
+  background-color: var(--purple-fading-soft);
+}
+
+.reset-button {
+  flex: 1;
+  background-color: var(--background-color);
+  border: 1px solid var(--purple-fading);
+  border-radius: 6px;
+  padding: 12px 15px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-color);
+  transition: background-color 0.3s;
+}
+
+.reset-button:hover {
+  background-color: rgba(var(--purple-fading-rgb), 0.1);
+}
+
+.danger-zone {
+  border: 1px solid #ffcdd2;
+  background-color: var(--background-soft-color);
+}
+
+.danger-zone h3 {
+  color: #d32f2f;
+}
+
+.danger-button {
+  background-color: #f44336;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 15px;
+  cursor: pointer;
+  font-size: 14px;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+.danger-button:hover {
+  background-color: #d32f2f;
+}
+
+.danger-info {
+  color: #d32f2f;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .settings-actions {
+    flex-direction: column;
+  }
+  
+  .settings-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .settings-section {
+    width: 95%;
+    padding: 20px;
+  }
+}
