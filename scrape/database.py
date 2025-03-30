@@ -84,19 +84,19 @@ async def cache_day_value(platform: Platform, source, day_ts, sentiment):
         print(f"Error when writing to firebase with {platform.value}/{source}/sentiments/{day_ts}: {e}")
     
 # Saving posts
-async def save_posts(platform: Platform, source, post_sentiment_mapping):
+async def save_posts(platform: Platform, source, post_data_mapping):
     tasks = []
     
     # Create a task for each post-sentiment pair to add into the database
-    for post, sentiment in post_sentiment_mapping.items():
-        tasks.append(save_post(platform, source, post, sentiment))
+    for post, data in post_data_mapping.items():
+        tasks.append(save_post(platform, source, post, data))
     
     # Run all tasks concurrently...
     await asyncio.gather(*tasks)
     
     return
 
-async def save_post(platform: Platform, source, post, sentiment):
+async def save_post(platform: Platform, source, post, data):
     # Again, singular sync. call to add post/sentiment pair in the database
     
     try:
@@ -104,10 +104,7 @@ async def save_post(platform: Platform, source, post, sentiment):
             .document(source)\
             .collection("posts")\
             .document(post)\
-            .set({
-                'timestamp': post,
-                'score': sentiment
-            })
+            .set(data)
     except Exception as e:
         print(f"Error when writing to firebase with {platform.value}/{source}/posts/{post}: {e}")
         

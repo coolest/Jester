@@ -193,7 +193,7 @@ async def handle_reddit(reddit_name, start_timestamp, end_timestamp):
             for post in posts:
                 post_id_mapping[post.fullname] = post
         
-        posts_sentiment = defaultdict()
+        posts_data = defaultdict()
         
         # Do sentiment analysis here
         for day, posts in posts_by_day.items():
@@ -211,15 +211,22 @@ async def handle_reddit(reddit_name, start_timestamp, end_timestamp):
                 sentiment = 1
                 sentiment_by_day[day] = sentiment
                 
+                # Create the post data with all required fields
+                post_data = {
+                    'timestamp': int(post.created_utc),
+                    'context': getattr(post, 'parent_id', None),
+                    'score': sentiment
+                }
+                
                 # Store in dictionary for saving in firebase
-                posts_sentiment[post.fullname] = sentiment
+                posts_data[post.fullname] = post_data
         
         # Save to database
         if DEBUG_MODE:
             print("SAVING TO DATABASE", end = ' ')
             
         tasks = []
-        tasks.append(database.save_posts(Platform.REDDIT, reddit_name, posts_sentiment))
+        tasks.append(database.save_posts(Platform.REDDIT, reddit_name, posts_data))
         tasks.append(database.cache_values(Platform.REDDIT, reddit_name, sentiment_by_day))
         await asyncio.gather(*tasks) # Block until the data has been saved...
         

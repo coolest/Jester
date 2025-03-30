@@ -245,7 +245,7 @@ async def handle_youtube(channel_or_search, start_timestamp=None, end_timestamp=
             for post in posts:
                 post_id_mapping[post['fullname']] = post
         
-        posts_sentiment = {}
+        posts_data = {}
         for day, posts in posts_by_day.items():
             for post in posts:
                 parents = []
@@ -259,13 +259,20 @@ async def handle_youtube(channel_or_search, start_timestamp=None, end_timestamp=
                 sentiment = 1
                 sentiment_by_day[day] += sentiment
                 
-                posts_sentiment[post['fullname']] = sentiment
+                # Create the post data with all required fields
+                post_data = {
+                    'timestamp': post.get('created_utc', 0),
+                    'context': post.get('parent_id') or comments_to_post.get(post['fullname']),
+                    'score': sentiment
+                }
+                
+                posts_data[post['fullname']] = post_data
         
         if DEBUG_MODE:
             print("SAVING TO DATABASE", end=' ')
             
         tasks = []
-        tasks.append(database.save_posts(Platform.YOUTUBE, identifier, posts_sentiment))
+        tasks.append(database.save_posts(Platform.YOUTUBE, identifier, posts_data))
         tasks.append(database.cache_values(Platform.YOUTUBE, identifier, sentiment_by_day))
         await asyncio.gather(*tasks)
         
