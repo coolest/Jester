@@ -136,4 +136,10 @@ dist
 .pnp.*
 
 # secret keys
-.env
+*.env
+scrape/db_auth.json
+scrape/__pycache__/database.cpython-311.pyc
+scrape/__pycache__/config.cpython-311.pyc
+jester-app/yarn.lock
+.DS_Store
+jester-app/yarn.lock
