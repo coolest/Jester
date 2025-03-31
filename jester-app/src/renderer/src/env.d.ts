@@ -4,6 +4,24 @@ interface Window {
       addCrypto: (cryptoData: any) => Promise<any>
       getCryptos: () => Promise<any[]>
       deleteCrypto: (id: string) => Promise<any>  
+
+      getSettings: () => Promise<any>
+      saveSettings: (settings : any) => Promise<any>,
+      
+      // Environment variable methods
+      getEnvVariables: () => Promise<any>,
+      updateEnvFile: (envVars : any) => Promise<any>,
+      
+      // Database auth file methods
+      saveDbAuthFile: (fileContent : any) => Promise<any>,
+      checkDbAuthExists: () => Promise<any>,
+      
+      // Connection testing methods
+      testRedditConnection: (credentials : any) => Promise<any>,
+      testTwitterConnection: (credentials : any) => Promise<any>,
+      testYoutubeConnection: (credentials : any) => Promise<any>,
+      testDatabaseConnection: () => Promise<any>
     }
+
     electron: any
   }
