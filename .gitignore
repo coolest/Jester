@@ -143,3 +143,6 @@ scrape/__pycache__/config.cpython-311.pyc
 jester-app/yarn.lock
 .DS_Store
 jester-app/yarn.lock
+DO_NOT_TOUCH/db_auth.json
+DO_NOT_TOUCH/__pycache__/config.cpython-311.pyc
+DO_NOT_TOUCH/__pycache__/database.cpython-311.pyc

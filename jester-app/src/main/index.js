@@ -72,7 +72,6 @@ ipcMain.handle('delete-crypto', (_event, id) => {
     throw error
   }
 })
-
 ipcMain.handle('get-settings', async () => {
   try {
     const settingsPath = path.join(app.getPath('userData'), 'settings.json');
@@ -100,11 +99,26 @@ ipcMain.handle('save-settings', async (event, settings) => {
   }
 });
 
+// Helper function to get path to scrape directory
+function getScrapePath() {
+  // Start from the directory containing the main script
+  const SCRAPE_PATH = path.join(__dirname, '..', '..', '..', 'scrape');
+  console.log('Scrape path:', SCRAPE_PATH);
+
+  // This should be "jester/out/main"
+  
+  // Navigate up to jester root, then to scrape directory
+  return SCRAPE_PATH;
+}
+
 // Environment variable management
 ipcMain.handle('get-env-variables', async () => {
   try {
-    // Path to .env file
-    const envPath = path.join(__dirname, 'scrape', '.env');
+    // Path to .env file using the helper function
+    const scrapePath = getScrapePath();
+    const envPath = path.join(scrapePath, '.env');
+    
+    console.log('Loading .env from path:', envPath);
     
     if (fs.existsSync(envPath)) {
       // Read and parse .env file
@@ -122,8 +136,11 @@ ipcMain.handle('get-env-variables', async () => {
 
 ipcMain.handle('update-env-file', async (event, envVars) => {
   try {
-    // Path to .env file
-    const envPath = path.join(__dirname, 'scrape', '.env');
+    // Path to .env file using the helper function
+    const scrapePath = getScrapePath();
+    const envPath = path.join(scrapePath, '.env');
+    
+    console.log('Saving .env to path:', envPath);
     
     // Format env vars into string
     let envContent = '';
@@ -144,8 +161,11 @@ ipcMain.handle('update-env-file', async (event, envVars) => {
 // Database auth file management
 ipcMain.handle('save-db-auth-file', async (event, fileContent) => {
   try {
-    // Path to db_auth.json file
-    const dbAuthPath = path.join(__dirname, 'scrape', 'db_auth.json');
+    // Path to db_auth.json file using the helper function
+    const scrapePath = getScrapePath();
+    const dbAuthPath = path.join(scrapePath, 'db_auth.json');
+    
+    console.log('Saving db_auth.json to path:', dbAuthPath);
     
     // Save file
     fs.writeFileSync(dbAuthPath, fileContent);
@@ -159,8 +179,9 @@ ipcMain.handle('save-db-auth-file', async (event, fileContent) => {
 
 ipcMain.handle('check-db-auth-exists', async () => {
   try {
-    // Path to db_auth.json file
-    const dbAuthPath = path.join(__dirname, 'scrape', 'db_auth.json');
+    // Path to db_auth.json file using the helper function
+    const scrapePath = getScrapePath();
+    const dbAuthPath = path.join(scrapePath, 'db_auth.json');
     
     return fs.existsSync(dbAuthPath);
   } catch (error) {
@@ -183,8 +204,9 @@ ipcMain.handle('test-reddit-connection', async (event, credentials) => {
     
     fs.writeFileSync(tempEnvPath, envContent);
     
-    // Run a test script that uses these credentials
-    const testScript = path.join(__dirname, 'scrape', 'test-reddit-connection.js');
+    // Run a test script that uses these credentials using the helper function
+    const scrapePath = getScrapePath();
+    const testScript = path.join(scrapePath, 'test-reddit-connection.js');
     
     exec(`node ${testScript} --env-file=${tempEnvPath}`, (error, stdout, stderr) => {
       // Clean up temp file
@@ -224,8 +246,9 @@ ipcMain.handle('test-twitter-connection', async (event, credentials) => {
     
     fs.writeFileSync(tempEnvPath, envContent);
     
-    // Run a test script that uses these credentials
-    const testScript = path.join(__dirname, 'scrape', 'test-twitter-connection.js');
+    // Run a test script that uses these credentials using the helper function
+    const scrapePath = getScrapePath();
+    const testScript = path.join(scrapePath, 'test-twitter-connection.js');
     
     exec(`node ${testScript} --env-file=${tempEnvPath}`, (error, stdout, stderr) => {
       // Clean up temp file
@@ -260,8 +283,9 @@ ipcMain.handle('test-youtube-connection', async (event, credentials) => {
     
     fs.writeFileSync(tempEnvPath, envContent);
     
-    // Run a test script that uses these credentials
-    const testScript = path.join(__dirname, 'scrape', 'test-youtube-connection.js');
+    // Run a test script that uses these credentials using the helper function
+    const scrapePath = getScrapePath();
+    const testScript = path.join(scrapePath, 'test-youtube-connection.js');
     
     exec(`node ${testScript} --env-file=${tempEnvPath}`, (error, stdout, stderr) => {
       // Clean up temp file
@@ -290,8 +314,9 @@ ipcMain.handle('test-youtube-connection', async (event, credentials) => {
 
 ipcMain.handle('test-database-connection', async () => {
   return new Promise((resolve, reject) => {
-    // Run a test script that uses the db_auth.json file
-    const testScript = path.join(__dirname, 'scrape', 'test-database-connection.js');
+    // Run a test script that uses the db_auth.json file using the helper function
+    const scrapePath = getScrapePath();
+    const testScript = path.join(scrapePath, 'test-database-connection.js');
     
     exec(`node ${testScript}`, (error, stdout, stderr) => {
       if (error) {
