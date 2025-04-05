@@ -1,0 +1,241 @@
+.new-report-container {
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .new-report-header {
+    margin-bottom: 24px;
+  }
+  
+  .new-report-header h2 {
+    margin: 0 0 8px 0;
+    font-size: 24px;
+    color: var(--text-color);
+  }
+  
+  .new-report-header p {
+    margin: 0;
+    color: var(--text-color);
+    opacity: 0.8;
+  }
+  
+  .loading-indicator {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-color);
+    font-size: 16px;
+  }
+  
+  .report-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .form-section {
+    background-color: var(--background-color);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--background-soft-color);
+  }
+  
+  .form-section h3 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    color: var(--text-color);
+    font-weight: 500;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color);
+  }
+  
+  .form-group input[type="text"],
+  .form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--background-soft-color);
+    background-color: var(--background-color);
+    font-size: 14px;
+    color: var(--text-color);
+  }
+  
+  .date-range-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  
+  .date-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .date-input-wrapper svg {
+    position: absolute;
+    left: 10px;
+    color: var(--text-color);
+    opacity: 0.7;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  .date-input-wrapper input {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    border-radius: 6px;
+    border: 1px solid var(--background-soft-color);
+    background-color: var(--background-color);
+    font-size: 14px;
+    color: var(--text-color);
+  }
+  
+  /* Styling for date input calendar picker */
+  input[type="date"] {
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+  
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7);
+    opacity: 0.8;
+    cursor: pointer;
+    background-color: transparent;
+  }
+  
+  input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    filter: invert(0.9);
+    opacity: 1;
+  }
+  
+  input[type="date"]:focus {
+    outline: none;
+    border-color: var(--purple-fading);
+    box-shadow: 0 0 0 2px rgba(103, 58, 183, 0.25);
+  }
+  
+  /* For Firefox */
+  @supports (-moz-appearance: none) {
+    input[type="date"] {
+      appearance: none;
+    }
+  }
+  
+  .date-presets {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  
+  .date-presets button {
+    background-color: var(--background-soft-color);
+    color: var(--text-color);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
+  
+  .date-presets button:hover {
+    background-color: var(--purple-fading);
+    color: white;
+  }
+  
+  .advanced-options-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .chevron {
+    transition: transform 0.3s ease;
+  }
+  
+  .chevron.rotate {
+    transform: rotate(180deg);
+  }
+  
+  .advanced-options {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--background-soft-color);
+  }
+  
+  .advanced-options h4 {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    color: var(--text-color);
+  }
+  
+  .platform-toggles {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .platform-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .platform-toggle input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+  
+  .platform-toggle label {
+    color: var(--text-color);
+    cursor: pointer;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+  
+  .create-report-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--purple-fading);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+  }
+  
+  .create-report-button:hover {
+    background-color: var(--purple-solid, #5e35b1);
+  }
+  
+  @media (max-width: 768px) {
+    .date-range-inputs {
+      grid-template-columns: 1fr;
+    }
+    
+    .platform-toggles {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }

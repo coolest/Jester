@@ -14,6 +14,10 @@
   border-bottom: 1px solid var(--background-soft-color);
 }
 
+.navbar-logo {
+  flex: 1;
+}
+
 .navbar-logo h1 {
   font-size: 1.5rem;
   color: var(--text-color);
@@ -24,7 +28,9 @@
 .navbar-menu {
   display: flex;
   align-items: center;
+  justify-content: center; /* Center the menu items */
   gap: 10px;
+  flex: 2; /* Give more space to the center section */
 }
 
 .navbar-item {
@@ -54,6 +60,8 @@
   align-items: center;
   gap: 10px;
   margin-right: 100px; /* Add spacing to prevent overlap with window controls */
+  flex: 1;
+  justify-content: flex-end; /* Push action items to the right */
 }
 
 .window-control-spacer {
@@ -74,6 +82,22 @@
 .navbar-item.notification:hover,
 .navbar-item.help:hover {
   background-color: var(--background-soft-color);
+}
+
+.navbar-item.new-report {
+  background-color: var(--purple-fading);
+  color: white;
+  margin-right: 10px;
+}
+
+.navbar-item.new-report:hover {
+  background-color: var(--purple-solid, #5e35b1);
+}
+
+.navbar-item.new-report.active {
+  background-color: var(--purple-solid, #5e35b1);
+  color: white;
+  font-weight: 500;
 }
 
 @media (max-width: 768px) {

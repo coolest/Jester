@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import '../../../assets/components/main/pages/Analytics.css';
+import { Plus, BarChart2 } from 'lucide-react';
 
 interface AnalyticsProps {
   selectedCryptoId: string;
+  onNavigate?: (route: string) => void; // Add navigation prop
 }
 
 interface Crypto {
@@ -35,7 +37,10 @@ interface CryptoSentiment {
   }[];
 }
 
-const Analytics: React.FC<AnalyticsProps> = ({ selectedCryptoId }) => {
+const Analytics: React.FC<AnalyticsProps> = ({ 
+  selectedCryptoId,
+  onNavigate = () => {} // Default empty function if not provided
+}) => {
   const [selectedCrypto, setSelectedCrypto] = useState<string>(selectedCryptoId);
   const [timeframe, setTimeframe] = useState<string>('1w');
   const [sentimentData, setSentimentData] = useState<CryptoSentiment | null>(null);
@@ -163,10 +168,40 @@ const Analytics: React.FC<AnalyticsProps> = ({ selectedCryptoId }) => {
     return '→';
   };
 
+  // Navigate to new report page
+  const handleCreateNewAnalysis = () => {
+    // Navigate to the new report page
+    onNavigate('newReport');
+  };
+
+  // View past analysis
+  const handleViewPastAnalysis = () => {
+    console.log('View past analysis clicked');
+    // Implement functionality later
+  };
+
   return (
     <div className="analytics-container">
       <div className="analytics-header">
-        <h2>Social Sentiment Analysis</h2>
+        <div className="analytics-title-container">
+          <h2>Social Sentiment Analysis</h2>
+          <div className="analytics-actions">
+            <button 
+              className="past-analysis-button"
+              onClick={handleViewPastAnalysis}
+              title="View past analysis"
+            >
+              Past Analysis
+            </button>
+            <button 
+              className="add-analysis-button"
+              onClick={handleCreateNewAnalysis}
+              title="Create new analysis"
+            >
+              <Plus size={20} />
+            </button>
+          </div>
+        </div>
         
         <div className="crypto-selector">
           <label htmlFor="crypto-select">Cryptocurrency:</label>
