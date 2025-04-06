@@ -29,14 +29,13 @@ async function testYoutubeConnection() {
   }
   
   try {
-    // Create YouTube client
+    // Create YouTube client using googleapis
     const youtube = google.youtube({
       version: 'v3',
       auth: apiKey
     });
     
     // Test connection by making a simple API call
-    // This query gets the most popular videos in the US
     const response = await youtube.videos.list({
       part: 'snippet',
       chart: 'mostPopular',
@@ -44,10 +43,14 @@ async function testYoutubeConnection() {
       maxResults: 1
     });
     
-    // If we get here, the connection was successful
-    const videoTitle = response.data.items[0].snippet.title;
-    console.log(`Connection successful! Retrieved video: "${videoTitle}"`);
-    return true;
+    // Check if we got a valid response
+    if (response.data && response.data.items && response.data.items.length > 0) {
+      const videoTitle = response.data.items[0].snippet.title;
+      console.log(`Connection successful! Retrieved video: "${videoTitle}"`);
+      return true;
+    } else {
+      throw new Error("Received empty response from YouTube API");
+    }
   } catch (error) {
     console.error(`YouTube connection failed: ${error.message}`);
     throw error;

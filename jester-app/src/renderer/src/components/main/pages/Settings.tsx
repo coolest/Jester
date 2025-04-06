@@ -395,30 +395,55 @@ const Settings: React.FC = () => {
     setSaveStatus(`Testing connection to ${service}...`);
     
     try {
-      // In a real app, this would actually test the connection
-      // Example: const result = await window.api.testConnection(service, credentials);
+      let result;
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Random success/failure for demo
-      const success = Math.random() > 0.3;
-      
-      if (success) {
-        setSaveStatus(`Successfully connected to ${service}!`);
-      } else {
-        setSaveStatus(`Failed to connect to ${service}. Please check your credentials.`);
+      switch (service) {
+        case 'reddit':
+          result = await window.api.testRedditConnection({
+            clientId: redditAuth.clientId,
+            clientSecret: redditAuth.clientSecret,
+            username: redditAuth.username,
+            password: redditAuth.password
+          });
+          break;
+          
+        case 'twitter':
+          result = await window.api.testTwitterConnection({
+            apiKey: twitterAuth.apiKey,
+            apiKeySecret: twitterAuth.apiKeySecret,
+            accessToken: twitterAuth.accessToken,
+            accessTokenSecret: twitterAuth.accessTokenSecret
+          });
+          break;
+          
+        case 'youtube':
+          result = await window.api.testYoutubeConnection({
+            apiKey: youtubeAuth.apiKey
+          });
+          break;
+          
+        case 'database':
+          result = await window.api.testDatabaseConnection();
+          break;
       }
+      
+      console.log(`${service} connection test successful:`, result);
+      setSaveStatus(`Successfully connected to ${service}!`);
+
+      setTimeout(() => {
+        setSaveStatus('');
+      }, 5000); // works
     } catch (error) {
       console.error(`Error testing connection to ${service}:`, error);
-      setSaveStatus(`Error testing connection to ${service}.`);
+      setSaveStatus(`Failed to connect to ${service}. ${error || 'Please check your credentials.'}`);
+
+      setTimeout(() => {
+        setSaveStatus('');
+      }, 25000); // can read it
     }
     
-    // Clear status message after 3 seconds
-    setTimeout(() => {
-      setSaveStatus('');
-    }, 3000);
   };
+  
 
   return (
     <div className="settings-container">

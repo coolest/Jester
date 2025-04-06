@@ -1,0 +1,18 @@
+{
+  "name": "scrape",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test-database-connection.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "googleapis": "^148.0.0",
+    "snoowrap": "^1.23.0",
+    "twitter-api-v2": "^1.22.0"
+  }
+}

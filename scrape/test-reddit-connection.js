@@ -1,4 +1,4 @@
-const asyncpraw = require('asyncpraw');
+const snoowrap = require('snoowrap');
 const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
@@ -23,38 +23,33 @@ if (envFilePath && fs.existsSync(envFilePath)) {
 async function testRedditConnection() {
   const client_id = process.env.REDDIT_CLIENT_ID;
   const client_secret = process.env.REDDIT_CLIENT_SECRET;
-  const client_username = process.env.REDDIT_USERNAME;
-  const client_password = process.env.REDDIT_PASSWORD;
+  const username = process.env.REDDIT_USERNAME;
+  const password = process.env.REDDIT_PASSWORD;
+  
+  console.log(`Testing connection with client ID: ${client_id}`);
   
   // Check if all required credentials are present
-  if (!client_id || !client_secret || !client_username || !client_password) {
+  if (!client_id || !client_secret || !username || !password) {
     throw new Error("Missing required Reddit API credentials in environment variables");
   }
   
-  let reddit = null;
-  
   try {
-    // Create Reddit client
-    reddit = new asyncpraw.Reddit({
-      client_id: client_id,
-      client_secret: client_secret,
-      password: client_password,
-      username: client_username,
-      user_agent: 'SentimentJester/1.0 Testing'
+    // Create Reddit client using snoowrap (the JavaScript wrapper for Reddit API)
+    const reddit = new snoowrap({
+      userAgent: 'SentimentJester/1.0 Testing',
+      clientId: client_id,
+      clientSecret: client_secret,
+      username: username,
+      password: password
     });
     
     // Test connection by fetching the user's profile
-    const me = await reddit.user.me();
+    const me = await reddit.getMe();
     console.log(`Connection successful! Authenticated as ${me.name}`);
     return true;
   } catch (error) {
     console.error(`Reddit connection failed: ${error.message}`);
     throw error;
-  } finally {
-    // Close the Reddit client if it was created
-    if (reddit) {
-      await reddit.close();
-    }
   }
 }
 
