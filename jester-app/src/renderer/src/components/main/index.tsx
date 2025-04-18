@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard'
 import Analytics from './pages/Analytics'
 import Settings from './pages/Settings'
 import NewReport from './pages/newReport' // Import the NewReport component
+import Reports from './pages/Reports';
 
 // Shared interface for sidebar data
 interface SidebarItem {
@@ -88,7 +89,9 @@ export const Main: React.FC = () => {
       case 'settings':
         return <Settings />
       case 'newReport':
-        return <NewReport />
+        return <NewReport onNavigate={handleNavigate} />
+      case 'reports':
+        return <Reports onNavigate={handleNavigate} />
       default:
         return (
           <>

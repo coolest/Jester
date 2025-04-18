@@ -1,0 +1,857 @@
+/* Reports.css */
+.reports-container {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: auto;
+  }
+  
+  .reports-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .reports-header h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--text-color);
+  }
+  
+  .reports-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .refresh-button, 
+  .create-report-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .refresh-button {
+    background-color: var(--bg-color-light);
+    color: var(--text-color);
+  }
+  
+  .refresh-button:hover {
+    background-color: var(--bg-color-lighter);
+  }
+  
+  .create-report-button {
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .create-report-button:hover {
+    background-color: var(--primary-color-dark);
+  }
+  
+  .error-message {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: var(--red-light);
+    color: var(--red);
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    gap: 0.5rem;
+  }
+  
+  .error-message button {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--red);
+    cursor: pointer;
+  }
+  
+  .reports-list-container {
+    flex: 1;
+    overflow: auto;
+  }
+  
+  .loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: var(--text-color-light);
+    gap: 1rem;
+  }
+  
+  .spinning {
+    animation: spin 1.5s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .no-reports {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: var(--text-color-light);
+    text-align: center;
+  }
+  
+  .no-reports p {
+    margin: 1rem 0;
+    font-size: 1.1rem;
+  }
+  
+  .no-reports button {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+  }
+  
+  .no-reports button:hover {
+    background-color: var(--primary-color-dark);
+  }
+  
+  .reports-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .report-item {
+    background-color: var(--bg-color-light);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .report-item.expanded {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .report-header:hover {
+    background-color: var(--bg-color-lighter);
+  }
+  
+  .report-title-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 2;
+  }
+  
+  .report-title {
+    font-weight: 500;
+    color: var(--text-color);
+  }
+  
+  .expand-icon {
+    transition: transform 0.3s ease;
+  }
+  
+  .expand-icon.rotated {
+    transform: rotate(90deg);
+  }
+  
+  .report-crypto {
+    flex: 1;
+    color: var(--text-color-light);
+  }
+  
+  .report-date {
+    flex: 1;
+    text-align: right;
+    color: var(--text-color-light);
+    font-size: 0.9rem;
+  }
+  
+  .status-badge {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: white;
+    gap: 0.25rem;
+    height: 1.5rem;
+  }
+  
+  .status-icon {
+    display: flex;
+  }
+  
+  .platform-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .platform-badge {
+    background-color: var(--bg-color-dark);
+    color: var(--text-color-light);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+  }
+  
+  .report-details {
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+  }
+  
+  .report-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .report-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .report-info-item.error {
+    color: var(--red);
+  }
+  
+  .report-info-item .label {
+    font-size: 0.85rem;
+    color: var(--text-color-light);
+  }
+  
+  .report-info-item .value {
+    font-size: 0.95rem;
+    color: var(--text-color);
+  }
+  
+  .platform-status-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .platform-status-section h4 {
+    font-size: 1rem;
+    margin: 0 0 0.75rem 0;
+    color: var(--text-color);
+  }
+  
+  .platform-status-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .platform-status-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background-color: var(--bg-color-light);
+    border-radius: 4px;
+    min-width: 120px;
+  }
+  
+  .platform-name {
+    font-size: 0.9rem;
+    color: var(--text-color-light);
+  }
+  
+  .report-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  
+  .report-actions button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  
+  .view-button {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  .view-button:hover {
+    background-color: var(--primary-color-dark);
+  }
+  
+  .view-button:disabled {
+    background-color: var(--bg-color-light);
+    color: var(--text-color-light);
+    cursor: not-allowed;
+  }
+  
+  .cancel-button {
+    background-color: var(--orange);
+    color: white;
+  }
+  
+  .cancel-button:hover {
+    background-color: var(--orange-dark);
+  }
+  
+  .delete-button {
+    background-color: var(--red);
+    color: white;
+  }
+  
+  .delete-button:hover {
+    background-color: var(--red-dark);
+  }
+  
+  /* Modal styles */
+  .report-results-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: var(--bg-color);
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .modal-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: var(--text-color);
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    color: var(--text-color-light);
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  
+  .close-button:hover {
+    color: var(--text-color);
+  }
+  
+  .report-results {
+    padding: 1.5rem;
+    overflow-y: auto;
+  }
+  
+  .results-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .summary-item .label {
+    font-size: 0.85rem;
+    color: var(--text-color-light);
+  }
+  
+  .summary-item .value {
+    font-size: 1rem;
+  }
+  
+  .results-visualization {
+    margin-bottom: 2rem;
+  }
+  
+  .results-visualization h4 {
+    font-size: 1.1rem;
+    margin: 0 0 1rem 0;
+    color: var(--text-color);
+  }
+  
+  .results-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .results-table th, 
+  .results-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .results-table th {
+    font-weight: 500;
+    color: var(--text-color-light);
+    background-color: var(--bg-color-light);
+  }
+  
+  .results-table tr:hover {
+    background-color: var(--bg-color-lighter);
+  }
+  
+  /* Sentiment color classes */
+  .very-positive {
+    color: #2ecc71;
+  }
+  
+  .positive {
+    color: #27ae60;
+  }
+  
+  .neutral {
+    color: #f39c12;
+  }
+  
+  .negative {
+    color: #e74c3c;
+  }
+  
+  .very-negative {
+    color: #c0392b;
+  }
+  
+  .charts-section {
+    margin-top: 2rem;
+  }
+  
+  .charts-section h4 {
+    font-size: 1.1rem;
+    margin: 0 0 1rem 0;
+    color: var(--text-color);
+  }
+  
+  .sentiment-chart {
+    height: 300px;
+    background-color: var(--bg-color-light);
+    border-radius: 6px;
+  }
+  
+  .chart-placeholder {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color-light);
+  }
+
+
+.reports-container {
+    padding: 24px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .reports-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .reports-header h2 {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.8rem;
+  }
+  
+  .reports-actions {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .refresh-button, 
+  .create-report-button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .refresh-button {
+    background-color: var(--background-alt);
+    color: var(--text);
+  }
+  
+  .refresh-button:hover {
+    background-color: var(--hover);
+  }
+  
+  .create-report-button:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  .error-message {
+    background-color: var(--red-soft);
+    color: var(--red);
+    padding: 12px 16px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .error-message button {
+    background: none;
+    border: none;
+    color: var(--red);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+  }
+  
+  .loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    gap: 16px;
+    color: var(--text-muted);
+  }
+  
+  .spinning {
+    animation: spin 1.5s linear infinite;
+  }
+  
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  .no-reports {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 64px;
+    gap: 16px;
+    color: var(--text-muted);
+  }
+  
+  .no-reports button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .no-reports button:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  .reports-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+  }
+  
+  .report-item {
+    background-color: var(--background-alt);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .report-header {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    padding: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .report-header:hover {
+    background-color: var(--hover);
+  }
+  
+  .report-title-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .expand-icon {
+    transition: transform 0.2s ease;
+  }
+  
+  .expand-icon.rotated {
+    transform: rotate(90deg);
+  }
+  
+  .report-title {
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .report-crypto {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .report-date {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-align: right;
+    white-space: nowrap;
+  }
+  
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: white;
+  }
+  
+  .status-icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .report-details {
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--border);
+    background-color: var(--background);
+  }
+  
+  .report-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-top: 16px;
+  }
+  
+  .report-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .report-info-item .label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  
+  .report-info-item .value {
+    font-size: 0.9rem;
+    color: var(--text);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .report-info-item.error .value {
+    color: var(--red);
+  }
+  
+  .platform-badge {
+    background-color: var(--background-alt);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+  }
+  
+  .platform-status-section {
+    margin-bottom: 16px;
+  }
+  
+  .platform-status-section h4 {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+  
+  .platform-status-list {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .platform-status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+  }
+  
+  .platform-name {
+    font-weight: 500;
+    color: var(--text);
+  }
+  
+  .report-actions {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .view-button,
+  .cancel-button,
+  .delete-button {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    transition: all 0.2s ease;
+  }
+  
+  .view-button {
+    background-color: var(--primary);
+    color: white;
+  }
+  
+  .view-button:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  .view-button:disabled {
+    background-color: var(--background-alt);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+  
+  .cancel-button {
+    background-color: var(--orange-soft);
+    color: var(--orange);
+  }
+  
+  .cancel-button:hover {
+    background-color: var(--orange);
+    color: white;
+  }
+  
+  .delete-button {
+    background-color: var(--red-soft);
+    color: var(--red);
+  }
+  
+  .delete-button:hover {
+    background-color: var(--red);
+    color: white;
+  }
+  
+  /* Base CSS variables for light/dark mode compatibility */
+  :root {
+    --primary: #6200ea;
+    --primary-dark: #4d00b3;
+    --green: #4caf50;
+    --green-light: #8bc34a;
+    --yellow: #ffc107;
+    --orange: #ff9800;
+    --orange-soft: rgba(255, 152, 0, 0.1);
+    --red: #f44336;
+    --red-soft: rgba(244, 67, 54, 0.1);
+    --blue: #2196f3;
+    
+    --text: #212121;
+    --text-muted: #757575;
+    --background: #ffffff;
+    --background-alt: #f5f5f5;
+    --border: #e0e0e0;
+    --hover: #f0f0f0;
+  }
+  
+  /* Dark mode variables - these will be applied when dark mode is enabled */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text: #f5f5f5;
+      --text-muted: #9e9e9e;
+      --background: #121212;
+      --background-alt: #1e1e1e;
+      --border: #333333;
+      --hover: #2a2a2a;
+    }
+  }

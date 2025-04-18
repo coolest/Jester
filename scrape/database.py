@@ -5,7 +5,10 @@ from firebase_admin import firestore
 
 from config import *
 
-cred = credentials.Certificate("scrape/db_auth.json")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+db_auth_path = os.path.join(script_dir, "db_auth.json")
+
+cred = credentials.Certificate(db_auth_path)
 firebase_admin.initialize_app(cred)
 
 db = firestore.client()
