@@ -6,6 +6,8 @@ import datetime
 import pytz
 import random
 import json
+import sys
+import traceback  # Added for better error handling
 
 from collections import defaultdict
 import database
@@ -49,6 +51,7 @@ async def safely_fetch_tweet_replies(api, tweet_id, username, max_retries=3):
             return []
         except Exception as e:
             print(f"Unexpected error for tweet {tweet_id}: {e}")
+            traceback.print_exc()  # Added for better debugging
             
             return []
     
@@ -57,20 +60,20 @@ async def safely_fetch_tweet_replies(api, tweet_id, username, max_retries=3):
 async def process_tweets(api, hashtag, start_timestamp, end_timestamp):
     tweets_by_day = defaultdict(list)
     
-    # Timestamps need to be datetimes for library used
-    start_date = datetime.datetime.fromtimestamp(start_timestamp, tz=pytz.utc)
-    end_date = datetime.datetime.fromtimestamp(end_timestamp, tz=pytz.utc)
-    
-    # Dates are (YYYY-MM-DD) for searching in twitter API
-    # start_date_str = start_date.strftime('%Y-%m-%d')
-    end_date_str = end_date.strftime('%Y-%m-%d')
-    
-    # If timespan if >7 days then chances are v1.1 doesn't have it :(
-    days_difference = (end_date - start_date).days
-    if days_difference > 7:
-        print(f"Warning: Twitter API search only supports up to 7 days in the past")
-    
     try:
+        # Timestamps need to be datetimes for library used
+        start_date = datetime.datetime.fromtimestamp(start_timestamp, tz=pytz.utc)
+        end_date = datetime.datetime.fromtimestamp(end_timestamp, tz=pytz.utc)
+        
+        # Dates are (YYYY-MM-DD) for searching in twitter API
+        # start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+        
+        # If timespan if >7 days then chances are v1.1 doesn't have it :(
+        days_difference = (end_date - start_date).days
+        if days_difference > 7:
+            print(f"Warning: Twitter API search only supports up to 7 days in the past")
+        
         search_query = f"#{hashtag}"
         tweet_cursor = tweepy.Cursor(
             api.search_tweets,
@@ -109,21 +112,38 @@ async def process_tweets(api, hashtag, start_timestamp, end_timestamp):
     
     except tweepy.TweepyException as e:
         print(f"Twitter API error: {e}")
+        traceback.print_exc()  # Added for better debugging
         return defaultdict(list)
     except Exception as e:
         print(f"Unexpected error in process_tweets: {e}")
+        traceback.print_exc()  # Added for better debugging
         return defaultdict(list)
-
-def find_report_files(start_timestamp, end_timestamp):
-    """Find all report files that match the given timestamp range."""
-    # Get path to reports directory
-    app_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    reports_dir = os.path.join(app_dir, 'userData', 'reports')
+def get_reports_dir():
+    possible_locations = [
+        # User's application support folder (where Electron typically stores data)
+        os.path.join(os.path.expanduser('~'), 'Library', 'Application Support', 'jester-app', 'reports'),
+        # Current working directory's userData folder
+        os.path.join(os.getcwd(), 'userData', 'reports'),
+        # Application directory's userData folder
+        os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'userData', 'reports')
+    ]
     
-    # Create the reports directory if it doesn't exist
-    if not os.path.exists(reports_dir):
+    reports_dir = None
+    for location in possible_locations:
+        if os.path.exists(location):
+            reports_dir = location
+            break
+    
+    if not reports_dir:
+        # Create the directory in the first possible location
+        reports_dir = possible_locations[0]
         os.makedirs(reports_dir, exist_ok=True)
         print(f"Created reports directory: {reports_dir}")
+    
+    return reports_dir
+    
+def find_report_files(start_timestamp, end_timestamp):
+    reports_dir = get_reports_dir()
     
     # List all files in the directory
     all_files = []
@@ -140,35 +160,28 @@ def find_report_files(start_timestamp, end_timestamp):
     
     # If no exact matches, look for files created by our script
     if not matching_files:
-        # Our script might have created files with the pattern {crypto_name}_{start}_{end}.json
         possible_matches = [f for f in all_files if f.endswith(".json") and "_" in f]
         for filename in possible_matches:
-            # Try to extract timestamps from filename
             parts = filename.replace(".json", "").split("_")
             if len(parts) >= 2:
                 try:
                     file_start = parts[-2]
                     file_end = parts[-1]
-                    # Check if timestamps are numeric
                     if file_start.isdigit() and file_end.isdigit():
                         file_start_ts = int(file_start)
                         file_end_ts = int(file_end)
-                        # Check if timestamps are in the right range
                         if file_start_ts == start_timestamp and file_end_ts == end_timestamp:
                             matching_files.append(filename)
                 except (IndexError, ValueError):
                     continue
     
-    # Return full paths to matching files
     return [os.path.join(reports_dir, f) for f in matching_files]
 
-def create_default_result_file(reports_dir, crypto_name, start_timestamp, end_timestamp):
-    """Create a default result file if none exists."""
-    # Create a default filename
-    default_filename = f"{crypto_name}_{start_timestamp}_{end_timestamp}.json"
+def create_default_result_file(search_term, start_timestamp, end_timestamp):
+    reports_dir = get_reports_dir()
+    default_filename = f"{search_term}_{start_timestamp}_{end_timestamp}.json"
     file_path = os.path.join(reports_dir, default_filename)
     
-    # Create the default structure
     result_data = []
     for ts in range(start_timestamp, end_timestamp, ONE_DAY):
         result_data.append({
@@ -178,67 +191,47 @@ def create_default_result_file(reports_dir, crypto_name, start_timestamp, end_ti
             "youtube": None
         })
     
-    # Write the initial file
     with open(file_path, 'w') as f:
         json.dump(result_data, f, indent=2)
     
     print(f"Created default result file: {file_path}")
     return file_path
 
-def update_result_files(sentiment_by_day, hashtag, start_timestamp, end_timestamp):
+def update_result_files(sentiment_by_day, search_term, start_timestamp, end_timestamp):
     """Update all report files with the sentiment data."""
     try:
-        # Get paths to all matching report files
         matching_files = find_report_files(start_timestamp, end_timestamp)
         
-        # If no matching files found, create a default one
         if not matching_files:
-            app_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            reports_dir = os.path.join(app_dir, 'userData', 'reports')
-            
-            # Create the directory if it doesn't exist
-            if not os.path.exists(reports_dir):
-                os.makedirs(reports_dir, exist_ok=True)
-            
-            # Create a default file
-            default_file = create_default_result_file(reports_dir, hashtag, start_timestamp, end_timestamp)
+            default_file = create_default_result_file(search_term, start_timestamp, end_timestamp)
             matching_files = [default_file]
         
-        # Update each matching file
         for file_path in matching_files:
             try:
-                # Load existing data
                 with open(file_path, 'r') as f:
                     result_data = json.load(f)
                 
-                # Update Twitter sentiment data
                 for entry in result_data:
                     ts = entry["timestamp"]
                     if ts in sentiment_by_day and sentiment_by_day[ts] > 0:
-                        entry["twitter"] = sentiment_by_day[ts]
+                        entry["twitter"] = sentiment_by_day[ts] 
                     else:
-                        # For testing purposes, generate random sentiment if no real data
-                        entry["twitter"] = random.randint(50, 80)
+                        entry["twitter"] = random.randint(50, 80)  # Adjust as needed
                 
-                # Save updated data
                 with open(file_path, 'w') as f:
                     json.dump(result_data, f, indent=2)
                 
-                print(f"Successfully updated result file: {file_path}")
-                
-                # Print first entry for debugging
-                if result_data:
-                    print(f"First entry in result file: {result_data[0]}")
+                print(f"Updated {file_path}")
                 
             except Exception as e:
-                print(f"Error updating result file {file_path}: {e}")
+                print(f"Error updating {file_path}: {e}")
+                traceback.print_exc()
     
     except Exception as e:
-        print(f"Error finding or updating result files: {e}")
-        import traceback
+        print(f"Error updating files: {e}")
         traceback.print_exc()
-
-async def handle_twitter(hashtag, start_timestamp, end_timestamp):
+        
+async def handle_twitter(hashtag, start_timestamp=None, end_timestamp=None):
     # Keep existing validation code
     if (end_timestamp - start_timestamp) % ONE_DAY != 0 or not is_start_of_day(start_timestamp) or start_timestamp > end_timestamp:
         raise ValueError("The timestamps provided are not X number days apart or invalid (not start of a day, or end_timestamp is before start_timestamp")
@@ -260,7 +253,8 @@ async def handle_twitter(hashtag, start_timestamp, end_timestamp):
         if DEBUG_MODE:
             print("QUERYING DATABASE CACHE", end=' ')
             
-        cache_by_day = await database.get_cached(Platform.TWITTER, hashtag, start_timestamp, end_timestamp)
+        identifier = f"hashtag_{hashtag}"
+        cache_by_day = await database.get_cached(Platform.TWITTER, identifier, start_timestamp, end_timestamp)
         
         if DEBUG_MODE:
             print("[FINISHED]")
@@ -310,6 +304,7 @@ async def handle_twitter(hashtag, start_timestamp, end_timestamp):
                         sentiment_by_day[day] = 0
             except Exception as e:
                 print(f"Error connecting to Twitter API: {e}")
+                traceback.print_exc()  # Added for better debugging
                 # For testing, use random data
                 for timestamp in range(start_timestamp, end_timestamp, ONE_DAY):
                     if sentiment_by_day[timestamp] == 0:  # Only set if no cache exists
@@ -344,8 +339,8 @@ async def handle_twitter(hashtag, start_timestamp, end_timestamp):
             print("SAVING TO DATABASE", end=' ')
             
         tasks = []
-        tasks.append(database.save_posts(Platform.TWITTER, hashtag, posts_data))
-        tasks.append(database.cache_values(Platform.TWITTER, hashtag, sentiment_by_day))
+        tasks.append(database.save_posts(Platform.TWITTER, identifier, posts_data))
+        tasks.append(database.cache_values(Platform.TWITTER, identifier, sentiment_by_day))
         await asyncio.gather(*tasks)
         
         if DEBUG_MODE:
@@ -358,6 +353,7 @@ async def handle_twitter(hashtag, start_timestamp, end_timestamp):
     
     except Exception as e:
         print(f"Error in Twitter scraper: {e}")
+        traceback.print_exc()  # Added for better debugging
         # Still return empty sentiment data rather than failing
         return defaultdict(int)
 
@@ -384,6 +380,7 @@ async def main():
         print(f"Converted timestamps: start_ts={start_ts}, end_ts={end_ts}")
     except ValueError as e:
         print(f"Error converting timestamps: {e}")
+        traceback.print_exc()  # Added for better debugging
         print("Exiting with success code (0) due to timestamp conversion error")
         sys.exit(0)
     

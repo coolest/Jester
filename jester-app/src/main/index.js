@@ -560,204 +560,241 @@ async startReportGeneration(report) {
     }
     this.timeouts.clear();
   }
-
-  // Run Twitter scraper
-  async runTwitterScraper(reportId, hashtag, startTimestamp, endTimestamp, mainLogStream) {
-    const platform = 'twitter';
-    this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.RUNNING);
+// Fix for the Twitter scraper method
+async runTwitterScraper(reportId, hashtag, startTimestamp, endTimestamp) {
+  const platform = 'twitter';
+  this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.RUNNING);
+  
+  return new Promise((resolve, reject) => {
+    // Log start with more details
+    console.log(`Starting Twitter scraper for report ${reportId}, hashtag: ${hashtag}, timeRange: ${startTimestamp}-${endTimestamp}`);
+    this.writeToLog(reportId, `\n[${new Date().toISOString()}] Starting Twitter scraper for hashtag: ${hashtag}\n`);
     
-    return new Promise((resolve, reject) => {
-      // Log start
-      this.writeToLog(`\n[${new Date().toISOString()}] Starting Twitter scraper for hashtag: ${hashtag}\n`);
+    // Get path to Python script
+    const scriptPath = path.join(getScrapePath(), 'twitter.py');
+    console.log(`Twitter script path: ${scriptPath}`);
+    
+    if (!fs.existsSync(scriptPath)) {
+      const error = new Error(`Twitter scraper script not found at ${scriptPath}`);
+      console.error(error.message);
+      this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, error.message);
+      this.writeToLog(reportId, `ERROR: ${error.message}\n`);
+      reject(error);
+      return;
+    }
+    
+    // Log command being executed
+    const pythonCommand = `python3 ${scriptPath} --hashtag=${hashtag} --start=${startTimestamp} --end=${endTimestamp}`;
+    console.log(`Executing command: ${pythonCommand}`);
+    
+    // Spawn Python process with detailed logging
+    const pythonProcess = spawn('python3', [
+      scriptPath,
+      `--hashtag=${hashtag}`,
+      `--start=${startTimestamp}`,
+      `--end=${endTimestamp}`
+    ]);
+    
+    console.log(`Python process spawned with PID: ${pythonProcess.pid}`);
+    
+    // Track this process
+    this.reportService.trackProcess(reportId, platform, pythonProcess);
+    
+    // Set timeout (30 minutes)
+    const timeout = setTimeout(() => {
+      console.log(`Twitter scraper timeout triggered for report ${reportId}`);
+      this.writeToLog(reportId, `\n[${new Date().toISOString()}] Twitter scraper TIMEOUT after 30 minutes\n`);
       
-      // Get path to Python script
-      const scriptPath = path.join(getScrapePath(), 'twitter.py');
-      
-      if (!fs.existsSync(scriptPath)) {
-        const error = new Error(`Twitter scraper script not found at ${scriptPath}`);
-        this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, error.message);
-        this.writeToLog(`ERROR: ${error.message}\n`);
-        reject(error);
-        return;
+      try {
+        console.log(`Killing Python process ${pythonProcess.pid} due to timeout`);
+        pythonProcess.kill('SIGTERM');
+      } catch (error) {
+        console.error(`Error killing Python process: ${error.message}`);
       }
       
-      // Spawn Python process
-      const pythonProcess = spawn('python3', [
-        scriptPath,
-        `--hashtag=${hashtag}`,
-        `--start=${startTimestamp}`,
-        `--end=${endTimestamp}`
-      ]);
-      
-      // Track this process
-      this.reportService.trackProcess(reportId, platform, pythonProcess);
-      
-      // Set timeout (30 minutes)
-      const timeout = setTimeout(() => {
-        this.writeToLog(`\n[${new Date().toISOString()}] Twitter scraper TIMEOUT after 30 minutes\n`);
-        
-        try {
-          pythonProcess.kill('SIGTERM');
-        } catch (error) {
-          // Process might already be terminated
-        }
-        
-        this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, 'Process timed out after 30 minutes');
-        this.reportService.untrackProcess(reportId, platform);
-        reject(new Error('Twitter scraper timed out'));
-      }, 30 * 60 * 1000);
-      
-      this.timeouts.set(`${reportId}-${platform}`, timeout);
-      
-      // Capture stdout
-      pythonProcess.stdout.on('data', (data) => {
-        const output = data.toString();
-        this.writeToLog(`[Twitter] ${output}`);
-      });
-      
-      // Capture stderr
-      pythonProcess.stderr.on('data', (data) => {
-        const output = data.toString();
-        this.writeToLog(`[Twitter ERROR] ${output}`);
-      });
-      
-      // Handle process completion
-      pythonProcess.on('close', (code) => {
-        // Clear timeout
-        clearTimeout(this.timeouts.get(`${reportId}-${platform}`));
-        this.timeouts.delete(`${reportId}-${platform}`);
-        
-        // Untrack process
-        this.reportService.untrackProcess(reportId, platform);
-        
-        if (code === 0) {
-          this.writeToLog(`\n[${new Date().toISOString()}] Twitter scraper completed successfully\n`);
-          this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.COMPLETED);
-          resolve();
-        } else {
-          const errorMsg = `Twitter scraper exited with code ${code}`;
-          this.writeToLog(`\n[${new Date().toISOString()}] ${errorMsg}\n`);
-          this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, errorMsg);
-          reject(new Error(errorMsg));
-        }
-      });
-      
-      // Handle unexpected errors
-      pythonProcess.on('error', (error) => {
-        // Clear timeout
-        clearTimeout(this.timeouts.get(`${reportId}-${platform}`));
-        this.timeouts.delete(`${reportId}-${platform}`);
-        
-        // Log error
-        this.writeToLog(`\n[${new Date().toISOString()}] Twitter scraper error: ${error.message}\n`);
-        
-        // Update status
-        this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, error.message);
-        this.reportService.untrackProcess(reportId, platform);
-        
-        reject(error);
-      });
-    });
-  }
-
-  // Run YouTube scraper
-  async runYoutubeScraper(reportId, searchTerm, startTimestamp, endTimestamp, mainLogStream) {
-    const platform = 'youtube';
-    this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.RUNNING);
+      this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, 'Process timed out after 30 minutes');
+      this.reportService.untrackProcess(reportId, platform);
+      reject(new Error('Twitter scraper timed out'));
+    }, 30 * 60 * 1000);
     
-    return new Promise((resolve, reject) => {
-      // Log start
-      this.writeToLog(`\n[${new Date().toISOString()}] Starting YouTube scraper for search term: ${searchTerm}\n`);
+    this.timeouts.set(`${reportId}-${platform}`, timeout);
+    
+    // Capture stdout with full logging
+    pythonProcess.stdout.on('data', (data) => {
+      const output = data.toString();
+      console.log(`[Twitter stdout] ${output.trim()}`);
+      this.writeToLog(reportId, `[Twitter] ${output}`);
+    });
+    
+    // Capture stderr with full logging
+    pythonProcess.stderr.on('data', (data) => {
+      const output = data.toString();
+      console.error(`[Twitter stderr] ${output.trim()}`);
+      this.writeToLog(reportId, `[Twitter ERROR] ${output}`);
+    });
+    
+    // Handle process completion with detailed logging
+    pythonProcess.on('close', (code) => {
+      console.log(`Twitter scraper process exited with code ${code} for report ${reportId}`);
       
-      // Get path to Python script
-      const scriptPath = path.join(getScrapePath(), 'youtube.py');
+      // Clear timeout
+      clearTimeout(this.timeouts.get(`${reportId}-${platform}`));
+      this.timeouts.delete(`${reportId}-${platform}`);
       
-      if (!fs.existsSync(scriptPath)) {
-        const error = new Error(`YouTube scraper script not found at ${scriptPath}`);
-        this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, error.message);
-        this.writeToLog(`ERROR: ${error.message}\n`);
-        reject(error);
-        return;
+      // Untrack process
+      this.reportService.untrackProcess(reportId, platform);
+      
+      if (code === 0) {
+        console.log(`Twitter scraper completed successfully for report ${reportId}`);
+        this.writeToLog(reportId, `\n[${new Date().toISOString()}] Twitter scraper completed successfully\n`);
+        this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.COMPLETED);
+        resolve();
+      } else {
+        const errorMsg = `Twitter scraper exited with code ${code}`;
+        console.error(`${errorMsg} for report ${reportId}`);
+        this.writeToLog(reportId, `\n[${new Date().toISOString()}] ${errorMsg}\n`);
+        this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, errorMsg);
+        reject(new Error(errorMsg));
+      }
+    });
+    
+    // Handle unexpected errors with detailed logging
+    pythonProcess.on('error', (error) => {
+      console.error(`Twitter scraper process error for report ${reportId}: ${error.message}`);
+      
+      // Clear timeout
+      clearTimeout(this.timeouts.get(`${reportId}-${platform}`));
+      this.timeouts.delete(`${reportId}-${platform}`);
+      
+      // Log error
+      this.writeToLog(reportId, `\n[${new Date().toISOString()}] Twitter scraper error: ${error.message}\n`);
+      
+      // Update status
+      this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, error.message);
+      this.reportService.untrackProcess(reportId, platform);
+      
+      reject(error);
+    });
+  });
+}
+
+// Fix for the YouTube scraper method
+async runYoutubeScraper(reportId, searchTerm, startTimestamp, endTimestamp) {
+  const platform = 'youtube';
+  this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.RUNNING);
+  
+  return new Promise((resolve, reject) => {
+    // Log start with more details
+    console.log(`Starting YouTube scraper for report ${reportId}, search term: ${searchTerm}, timeRange: ${startTimestamp}-${endTimestamp}`);
+    this.writeToLog(reportId, `\n[${new Date().toISOString()}] Starting YouTube scraper for search term: ${searchTerm}\n`);
+    
+    // Get path to Python script
+    const scriptPath = path.join(getScrapePath(), 'youtube.py');
+    console.log(`YouTube script path: ${scriptPath}`);
+    
+    if (!fs.existsSync(scriptPath)) {
+      const error = new Error(`YouTube scraper script not found at ${scriptPath}`);
+      console.error(error.message);
+      this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, error.message);
+      this.writeToLog(reportId, `ERROR: ${error.message}\n`);
+      reject(error);
+      return;
+    }
+    
+    // Log command being executed
+    const pythonCommand = `python3 ${scriptPath} --search=${searchTerm} --start=${startTimestamp} --end=${endTimestamp}`;
+    console.log(`Executing command: ${pythonCommand}`);
+    
+    // Spawn Python process with detailed logging
+    const pythonProcess = spawn('python3', [
+      scriptPath,
+      `--search=${searchTerm}`,
+      `--start=${startTimestamp}`,
+      `--end=${endTimestamp}`
+    ]);
+    
+    console.log(`Python process spawned with PID: ${pythonProcess.pid}`);
+    
+    // Track this process
+    this.reportService.trackProcess(reportId, platform, pythonProcess);
+    
+    // Set timeout (30 minutes)
+    const timeout = setTimeout(() => {
+      console.log(`YouTube scraper timeout triggered for report ${reportId}`);
+      this.writeToLog(reportId, `\n[${new Date().toISOString()}] YouTube scraper TIMEOUT after 30 minutes\n`);
+      
+      try {
+        console.log(`Killing Python process ${pythonProcess.pid} due to timeout`);
+        pythonProcess.kill('SIGTERM');
+      } catch (error) {
+        console.error(`Error killing Python process: ${error.message}`);
       }
       
-      // Spawn Python process
-      const pythonProcess = spawn('python3', [
-        scriptPath,
-        `--search=${searchTerm}`,
-        `--start=${startTimestamp}`,
-        `--end=${endTimestamp}`
-      ]);
-      
-      // Track this process
-      this.reportService.trackProcess(reportId, platform, pythonProcess);
-      
-      // Set timeout (30 minutes)
-      const timeout = setTimeout(() => {
-        this.writeToLog(`\n[${new Date().toISOString()}] YouTube scraper TIMEOUT after 30 minutes\n`);
-        
-        try {
-          pythonProcess.kill('SIGTERM');
-        } catch (error) {
-          // Process might already be terminated
-        }
-        
-        this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, 'Process timed out after 30 minutes');
-        this.reportService.untrackProcess(reportId, platform);
-        reject(new Error('YouTube scraper timed out'));
-      }, 30 * 60 * 1000);
-      
-      this.timeouts.set(`${reportId}-${platform}`, timeout);
-      
-      // Capture stdout
-      pythonProcess.stdout.on('data', (data) => {
-        const output = data.toString();
-        this.writeToLog(`[YouTube] ${output}`);
-      });
-      
-      // Capture stderr
-      pythonProcess.stderr.on('data', (data) => {
-        const output = data.toString();
-        this.writeToLog(`[YouTube ERROR] ${output}`);
-      });
-      
-      // Handle process completion
-      pythonProcess.on('close', (code) => {
-        // Clear timeout
-        clearTimeout(this.timeouts.get(`${reportId}-${platform}`));
-        this.timeouts.delete(`${reportId}-${platform}`);
-        
-        // Untrack process
-        this.reportService.untrackProcess(reportId, platform);
-        
-        if (code === 0) {
-          this.writeToLog(`\n[${new Date().toISOString()}] YouTube scraper completed successfully\n`);
-          this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.COMPLETED);
-          resolve();
-        } else {
-          const errorMsg = `YouTube scraper exited with code ${code}`;
-          this.writeToLog(`\n[${new Date().toISOString()}] ${errorMsg}\n`);
-          this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, errorMsg);
-          reject(new Error(errorMsg));
-        }
-      });
-      
-      // Handle unexpected errors
-      pythonProcess.on('error', (error) => {
-        // Clear timeout
-        clearTimeout(this.timeouts.get(`${reportId}-${platform}`));
-        this.timeouts.delete(`${reportId}-${platform}`);
-        
-        // Log error
-        this.writeToLog(`\n[${new Date().toISOString()}] YouTube scraper error: ${error.message}\n`);
-        
-        // Update status
-        this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, error.message);
-        this.reportService.untrackProcess(reportId, platform);
-        
-        reject(error);
-      });
+      this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, 'Process timed out after 30 minutes');
+      this.reportService.untrackProcess(reportId, platform);
+      reject(new Error('YouTube scraper timed out'));
+    }, 30 * 60 * 1000);
+    
+    this.timeouts.set(`${reportId}-${platform}`, timeout);
+    
+    // Capture stdout with full logging
+    pythonProcess.stdout.on('data', (data) => {
+      const output = data.toString();
+      console.log(`[YouTube stdout] ${output.trim()}`);
+      this.writeToLog(reportId, `[YouTube] ${output}`);
     });
-  }
+    
+    // Capture stderr with full logging
+    pythonProcess.stderr.on('data', (data) => {
+      const output = data.toString();
+      console.error(`[YouTube stderr] ${output.trim()}`);
+      this.writeToLog(reportId, `[YouTube ERROR] ${output}`);
+    });
+    
+    // Handle process completion with detailed logging
+    pythonProcess.on('close', (code) => {
+      console.log(`YouTube scraper process exited with code ${code} for report ${reportId}`);
+      
+      // Clear timeout
+      clearTimeout(this.timeouts.get(`${reportId}-${platform}`));
+      this.timeouts.delete(`${reportId}-${platform}`);
+      
+      // Untrack process
+      this.reportService.untrackProcess(reportId, platform);
+      
+      if (code === 0) {
+        console.log(`YouTube scraper completed successfully for report ${reportId}`);
+        this.writeToLog(reportId, `\n[${new Date().toISOString()}] YouTube scraper completed successfully\n`);
+        this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.COMPLETED);
+        resolve();
+      } else {
+        const errorMsg = `YouTube scraper exited with code ${code}`;
+        console.error(`${errorMsg} for report ${reportId}`);
+        this.writeToLog(reportId, `\n[${new Date().toISOString()}] ${errorMsg}\n`);
+        this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, errorMsg);
+        reject(new Error(errorMsg));
+      }
+    });
+    
+    // Handle unexpected errors with detailed logging
+    pythonProcess.on('error', (error) => {
+      console.error(`YouTube scraper process error for report ${reportId}: ${error.message}`);
+      
+      // Clear timeout
+      clearTimeout(this.timeouts.get(`${reportId}-${platform}`));
+      this.timeouts.delete(`${reportId}-${platform}`);
+      
+      // Log error
+      this.writeToLog(reportId, `\n[${new Date().toISOString()}] YouTube scraper error: ${error.message}\n`);
+      
+      // Update status
+      this.reportService.updatePlatformStatus(reportId, platform, ReportStatus.FAILED, error.message);
+      this.reportService.untrackProcess(reportId, platform);
+      
+      reject(error);
+    });
+  });
+}
 
   // Cancel a running report
   cancelReport(reportId) {
