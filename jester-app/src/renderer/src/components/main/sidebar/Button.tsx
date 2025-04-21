@@ -44,7 +44,6 @@ export const Button: React.FC<ButtonProp> = ({ tag, score}) => {
           transition: 'color 0.5s ease' // Smooth transition
         }}
       >
-        {score}
       </div>
     </button>
   )

@@ -223,24 +223,12 @@ const Reports: React.FC<ReportsProps> = ({ onNavigate = () => {} }) => {
   };
 
   // View report details using the new enhanced modal
-  const handleViewReport = (report: Report) => {
+  const handleViewReport = async (report: Report) => {
+    // Store the selected report
     setSelectedReport(report);
     
-    // Set up a retry mechanism in case the file is still being processed
-    let retryCount = 0;
-    const maxRetries = 3;
-    
-    const tryLoadReportData = async () => {
-      await loadReportData(report.id);
-      
-      if (!reportData && retryCount < maxRetries) {
-        retryCount++;
-        console.log(`No report data found, retrying (${retryCount}/${maxRetries})...`);
-        setTimeout(tryLoadReportData, 2000); // Retry after 2 seconds
-      }
-    };
-    
-    tryLoadReportData();
+    // Navigate to analytics with this crypto selected
+    onNavigate('analytics', { cryptoId: report.cryptoId });
   };
 
   // Close the report view modal

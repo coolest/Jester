@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import '../../../assets/components/main/pages/Analytics.css';
-import { Plus, BarChart2 } from 'lucide-react';
+import { Plus, BarChart2, RefreshCw, AlertTriangle } from 'lucide-react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
 
 interface AnalyticsProps {
   selectedCryptoId: string;
-  onNavigate?: (route: string) => void; // Add navigation prop
+  onNavigate?: (route: string, params?: any) => void;
 }
 
 interface Crypto {
@@ -17,35 +27,45 @@ interface Crypto {
   img?: string;
 }
 
-interface SentimentData {
-  platform: string;
-  positive: number;
-  neutral: number;
-  negative: number;
-  volume: number;
-  trend: 'up' | 'down' | 'stable';
+interface SentimentDataPoint {
+  timestamp: number;
+  reddit: number | null;
+  twitter: number | null;
+  youtube: number | null;
+  formattedDate?: string;
+  average?: number;
 }
 
-interface CryptoSentiment {
-  name: string;
-  symbol: string;
-  overallScore: number;
-  sources: SentimentData[];
-  historicalSentiment: {
-    date: string;
-    score: number;
-  }[];
+interface Report {
+  id: string;
+  cryptoId: string;
+  cryptoName: string;
+  reportName: string;
+  timeRange: {
+    startDate: string;
+    endDate: string;
+  };
+  platforms: {
+    reddit: boolean;
+    twitter: boolean;
+    youtube: boolean;
+  };
+  status: string;
+  resultFilePath: string;
+  createdAt: string;
 }
 
 const Analytics: React.FC<AnalyticsProps> = ({ 
   selectedCryptoId,
-  onNavigate = () => {} // Default empty function if not provided
+  onNavigate = () => {}
 }) => {
   const [selectedCrypto, setSelectedCrypto] = useState<string>(selectedCryptoId);
-  const [timeframe, setTimeframe] = useState<string>('1w');
-  const [sentimentData, setSentimentData] = useState<CryptoSentiment | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [availableCryptos, setAvailableCryptos] = useState<Crypto[]>([]);
+  const [recentReport, setRecentReport] = useState<Report | null>(null);
+  const [reportData, setReportData] = useState<SentimentDataPoint[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [cryptoDetails, setCryptoDetails] = useState<Crypto | null>(null);
 
   // Update selected crypto when props change
   useEffect(() => {
@@ -65,119 +85,149 @@ const Analytics: React.FC<AnalyticsProps> = ({
         if (loadedCryptos.length > 0 && !selectedCrypto) {
           setSelectedCrypto(loadedCryptos[0].id);
         }
+        
+        // Find the current crypto's details
+        if (selectedCrypto) {
+          const crypto = loadedCryptos.find(c => c.id === selectedCrypto);
+          if (crypto) {
+            setCryptoDetails(crypto);
+          }
+        }
       } catch (error) {
         console.error('Error loading cryptos:', error);
+        setError('Failed to load cryptocurrencies. Please try again.');
       }
     };
 
     loadCryptos();
-  }, []);
+  }, [selectedCrypto]);
 
-  // Generate sentiment data when a crypto is selected
+  // Load recent reports for the selected crypto
   useEffect(() => {
-    // Don't fetch if no crypto is selected
-    if (!selectedCrypto) return;
-    
-    const fetchSentimentData = () => {
-      setIsLoading(true);
+    const loadRecentReport = async () => {
+      if (!selectedCrypto) return;
       
-      // In a real app, this would come from an API with real sentiment analysis
-      setTimeout(() => {
-        const selectedCryptoData = availableCryptos.find(c => c.id === selectedCrypto);
-        
-        if (!selectedCryptoData) {
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        // Get all reports
+        const result = await window.api.getAllReports();
+        if (result.success && result.reports && result.reports.length > 0) {
+          // Filter reports for this crypto and get the most recent completed one
+          const cryptoReports = result.reports.filter(
+            (report: Report) => report.cryptoId === selectedCrypto && report.status === 'completed'
+          );
+          
+          if (cryptoReports.length > 0) {
+            // Sort by creation date (newest first)
+            cryptoReports.sort((a: Report, b: Report) => 
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+            
+            // Get the most recent report
+            const latest = cryptoReports[0];
+            setRecentReport(latest);
+            
+            // Load the report data right away
+            await loadReportData(latest.id);
+          } else {
+            setRecentReport(null);
+            setReportData(null);
+            setIsLoading(false);
+          }
+        } else {
+          setRecentReport(null);
+          setReportData(null);
           setIsLoading(false);
-          return;
         }
-        
-        // Use the crypto's actual score if available
-        const baseScore = selectedCryptoData.score || Math.floor(Math.random() * 40) + 40; // Random 40-80 score
-        
-        // Mock data using the actual crypto information
-        const mockSentimentData: CryptoSentiment = {
-          name: selectedCryptoData.cryptoName,
-          symbol: selectedCryptoData.cryptoName.substring(0, 3).toUpperCase(), // Generate a symbol from the name
-          overallScore: baseScore,
-          sources: [
-            { 
-              platform: 'Reddit', 
-              positive: Math.floor(baseScore * 0.9 + Math.random() * 10), 
-              neutral: Math.floor((100 - baseScore) * 0.6), 
-              negative: Math.floor((100 - baseScore) * 0.4),
-              volume: Math.floor(Math.random() * 2000) + 500,
-              trend: Math.random() > 0.3 ? 'up' : Math.random() > 0.5 ? 'stable' : 'down'
-            },
-            { 
-              platform: 'Twitter', 
-              positive: Math.floor(baseScore * 0.85 + Math.random() * 10), 
-              neutral: Math.floor((100 - baseScore) * 0.5), 
-              negative: Math.floor((100 - baseScore) * 0.5),
-              volume: Math.floor(Math.random() * 5000) + 2000,
-              trend: Math.random() > 0.3 ? 'up' : Math.random() > 0.5 ? 'stable' : 'down'
-            },
-            { 
-              platform: 'YouTube', 
-              positive: Math.floor(baseScore * 1.05 + Math.random() * 5), 
-              neutral: Math.floor((100 - baseScore) * 0.6), 
-              negative: Math.floor((100 - baseScore) * 0.4),
-              volume: Math.floor(Math.random() * 500) + 100,
-              trend: Math.random() > 0.3 ? 'up' : Math.random() > 0.5 ? 'stable' : 'down'
-            }
-          ],
-          historicalSentiment: [
-            { date: '7 days ago', score: baseScore - Math.floor(Math.random() * 15) },
-            { date: '6 days ago', score: baseScore - Math.floor(Math.random() * 12) },
-            { date: '5 days ago', score: baseScore - Math.floor(Math.random() * 8) },
-            { date: '4 days ago', score: baseScore - Math.floor(Math.random() * 10) },
-            { date: '3 days ago', score: baseScore - Math.floor(Math.random() * 5) },
-            { date: '2 days ago', score: baseScore - Math.floor(Math.random() * 3) },
-            { date: 'Yesterday', score: baseScore - 1 },
-            { date: 'Today', score: baseScore }
-          ]
-        };
-        
-        // Normalize percentage values to ensure they add up to 100%
-        mockSentimentData.sources.forEach(source => {
-          const total = source.positive + source.neutral + source.negative;
-          source.positive = Math.round(source.positive / total * 100);
-          source.neutral = Math.round(source.neutral / total * 100);
-          source.negative = 100 - source.positive - source.neutral;
+      } catch (error) {
+        console.error('Error loading recent reports:', error);
+        setError('Failed to load reports. Please try again.');
+        setIsLoading(false);
+      }
+    };
+    
+    loadRecentReport();
+  }, [selectedCrypto]);
+
+  // Load report data
+  const loadReportData = async (reportId: string) => {
+    try {
+      const result = await window.api.getReportById(reportId);
+      
+      if (result.success && result.resultData) {
+        // Ensure the data is properly formatted
+        const formattedData = result.resultData.map((item: any) => {
+          // Format date for each data point
+          const date = new Date(item.timestamp * 1000);
+          const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
+          
+          // Calculate average for this point
+          const values: any[] = [];
+          if (item.reddit !== null) values.push(item.reddit);
+          if (item.twitter !== null) values.push(item.twitter);
+          if (item.youtube !== null) values.push(item.youtube);
+          const average = values.length > 0 ? values.reduce((sum, val) => sum + val, 0) / values.length : null;
+          
+          return {
+            timestamp: item.timestamp,
+            reddit: typeof item.reddit === 'number' ? item.reddit : null,
+            twitter: typeof item.twitter === 'number' ? item.twitter : null,
+            youtube: typeof item.youtube === 'number' ? item.youtube : null,
+            formattedDate,
+            average
+          };
         });
         
-        setSentimentData(mockSentimentData);
+        // Sort by timestamp (oldest to newest)
+        formattedData.sort((a, b) => a.timestamp - b.timestamp);
+        
+        setReportData(formattedData);
         setIsLoading(false);
-      }, 800);
-    };
-
-    fetchSentimentData();
-  }, [selectedCrypto, timeframe, availableCryptos]);
-
-  // Calculate overall sentiment class
-  const getSentimentClass = (score: number): string => {
-    if (score >= 70) return 'very-positive';
-    if (score >= 55) return 'positive';
-    if (score >= 45) return 'neutral';
-    if (score >= 30) return 'negative';
-    return 'very-negative';
-  };
-
-  // Format trend indicator
-  const getTrendIndicator = (trend: 'up' | 'down' | 'stable'): string => {
-    if (trend === 'up') return '↑';
-    if (trend === 'down') return '↓';
-    return '→';
+        return true;
+      } else {
+        console.error('Error loading report data:', result.error);
+        setError('Failed to load report data. Please try again.');
+        setIsLoading(false);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error loading report data:', error);
+      setError('An unexpected error occurred while loading data.');
+      setIsLoading(false);
+      return false;
+    }
   };
 
   // Navigate to new report page
   const handleCreateNewAnalysis = () => {
-    // Navigate to the new report page
     onNavigate('newReport');
   };
 
   // View past analysis
   const handleViewPastAnalysis = () => {
-    console.log('View past analysis clicked');
-    // Implement functionality later
+    onNavigate('reports', { cryptoId: selectedCrypto });
+  };
+
+  // Get custom stroke colors
+  const getStrokeColor = (platform: string) => {
+    switch (platform) {
+      case 'reddit':
+        return '#FF4500'; // Reddit orange
+      case 'twitter':
+        return '#1DA1F2'; // Twitter blue
+      case 'youtube':
+        return '#FF0000'; // YouTube red
+      default:
+        return '#4CAF50'; // Green for average
+    }
+  };
+
+  // Format timestamp to readable date
+  const formatDate = (timestamp: string | number) => {
+    const ts = typeof timestamp === 'string' ? parseInt(timestamp) : timestamp;
+    return new Date(ts * 1000).toLocaleDateString();
   };
 
   return (
@@ -209,7 +259,7 @@ const Analytics: React.FC<AnalyticsProps> = ({
             id="crypto-select" 
             value={selectedCrypto}
             onChange={(e) => setSelectedCrypto(e.target.value)}
-            disabled={availableCryptos.length === 0}
+            disabled={availableCryptos.length === 0 || isLoading}
           >
             {availableCryptos.length === 0 ? (
               <option value="">No cryptocurrencies added</option>
@@ -222,151 +272,234 @@ const Analytics: React.FC<AnalyticsProps> = ({
             )}
           </select>
         </div>
-        
-        <div className="timeframe-selector">
-          <button 
-            className={timeframe === '24h' ? 'active' : ''} 
-            onClick={() => setTimeframe('24h')}
-          >
-            24H
-          </button>
-          <button 
-            className={timeframe === '1w' ? 'active' : ''} 
-            onClick={() => setTimeframe('1w')}
-          >
-            1W
-          </button>
-          <button 
-            className={timeframe === '1m' ? 'active' : ''} 
-            onClick={() => setTimeframe('1m')}
-          >
-            1M
-          </button>
-          <button 
-            className={timeframe === '3m' ? 'active' : ''} 
-            onClick={() => setTimeframe('3m')}
-          >
-            3M
-          </button>
-        </div>
       </div>
 
+      {error && (
+        <div className="error-message">
+          <AlertTriangle size={18} />
+          <span>{error}</span>
+        </div>
+      )}
+
       {isLoading ? (
-        <div className="loading-indicator">Loading sentiment data...</div>
-      ) : sentimentData && (
-        <>
-          <div className="sentiment-overview">
-            <div className="overall-sentiment">
-              <h3>Overall Sentiment Score</h3>
-              <div className={`sentiment-score ${getSentimentClass(sentimentData.overallScore)}`}>
-                {sentimentData.overallScore}
-              </div>
-              <div className="sentiment-label">
-                {
-                  sentimentData.overallScore >= 70 ? 'Very Positive' :
-                  sentimentData.overallScore >= 55 ? 'Positive' :
-                  sentimentData.overallScore >= 45 ? 'Neutral' :
-                  sentimentData.overallScore >= 30 ? 'Negative' : 'Very Negative'
-                }
-              </div>
-            </div>
-
-            <div className="sentiment-summary">
-              <h3>Sentiment Trend ({timeframe})</h3>
-              <div className="trend-visualization">
-                {sentimentData.historicalSentiment.map((data, index) => (
-                  <div key={index} className="trend-day">
-                    <div 
-                      className={`trend-bar ${getSentimentClass(data.score)}`}
-                      style={{ height: `${data.score}%` }}
-                    ></div>
-                    <div className="trend-date">{data.date}</div>
-                  </div>
-                ))}
-              </div>
+        <div className="loading-indicator">
+          <RefreshCw size={24} className="spinning" />
+          <span>Loading sentiment data...</span>
+        </div>
+      ) : recentReport && reportData && reportData.length > 0 ? (
+        // Show data visualization if we have report data
+        <div className="report-visualization">
+          <div className="report-info">
+            <h3>{recentReport.reportName}</h3>
+            <div className="report-date-range">
+              {formatDate(recentReport.timeRange.startDate)} - {formatDate(recentReport.timeRange.endDate)}
             </div>
           </div>
 
-          <div className="analytics-section">
-            <h3>Sentiment by Platform</h3>
-            <div className="platform-table">
-              <table>
-                <thead>
+          {/* Main Chart */}
+          <div className="chart-container">
+            <h3>Sentiment Trends</h3>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart
+                data={reportData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="formattedDate" />
+                <YAxis domain={[0, 100]} />
+                <Tooltip 
+                  formatter={(value: any) => [value ? value.toFixed(1) : 'N/A', '']}
+                  labelFormatter={(label: string) => `Date: ${label}`}
+                />
+                <Legend />
+                
+                {recentReport.platforms.reddit && (
+                  <Line
+                    type="monotone"
+                    dataKey="reddit"
+                    name="Reddit"
+                    stroke={getStrokeColor('reddit')}
+                    activeDot={{ r: 8 }}
+                    connectNulls
+                  />
+                )}
+                
+                {recentReport.platforms.twitter && (
+                  <Line
+                    type="monotone"
+                    dataKey="twitter"
+                    name="Twitter"
+                    stroke={getStrokeColor('twitter')}
+                    activeDot={{ r: 8 }}
+                    connectNulls
+                  />
+                )}
+                
+                {recentReport.platforms.youtube && (
+                  <Line
+                    type="monotone"
+                    dataKey="youtube"
+                    name="YouTube"
+                    stroke={getStrokeColor('youtube')}
+                    activeDot={{ r: 8 }}
+                    connectNulls
+                  />
+                )}
+                
+                <Line
+                  type="monotone"
+                  dataKey="average"
+                  name="Average"
+                  stroke={getStrokeColor('average')}
+                  strokeWidth={2}
+                  activeDot={{ r: 8 }}
+                  connectNulls
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Platform statistics table */}
+          <div className="platform-statistics">
+            <h3>Platform Sentiment</h3>
+            <table className="statistics-table">
+              <thead>
+                <tr>
+                  <th>Platform</th>
+                  <th>Average Sentiment</th>
+                  <th>Data Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentReport.platforms.reddit && (
                   <tr>
-                    <th>Platform</th>
-                    <th>Positive</th>
-                    <th>Neutral</th>
-                    <th>Negative</th>
-                    <th>Mentions</th>
-                    <th>Trend</th>
+                    <td>Reddit</td>
+                    <td>
+                      {reportData.filter(d => d.reddit !== null).length > 0 ? 
+                        (reportData.reduce((sum, point) => point.reddit !== null ? sum + point.reddit : sum, 0) / 
+                        reportData.filter(d => d.reddit !== null).length).toFixed(1) : 
+                        'N/A'}
+                    </td>
+                    <td>{reportData.filter(d => d.reddit !== null).length}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {sentimentData.sources.map((source) => (
-                    <tr key={source.platform}>
-                      <td className="platform-name">{source.platform}</td>
-                      <td className="positive">{source.positive}%</td>
-                      <td className="neutral">{source.neutral}%</td>
-                      <td className="negative">{source.negative}%</td>
-                      <td>{source.volume.toLocaleString()}</td>
-                      <td className={source.trend === 'up' ? 'positive' : source.trend === 'down' ? 'negative' : 'neutral'}>
-                        {getTrendIndicator(source.trend)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                )}
+                
+                {recentReport.platforms.twitter && (
+                  <tr>
+                    <td>Twitter</td>
+                    <td>
+                      {reportData.filter(d => d.twitter !== null).length > 0 ? 
+                        (reportData.reduce((sum, point) => point.twitter !== null ? sum + point.twitter : sum, 0) / 
+                        reportData.filter(d => d.twitter !== null).length).toFixed(1) : 
+                        'N/A'}
+                    </td>
+                    <td>{reportData.filter(d => d.twitter !== null).length}</td>
+                  </tr>
+                )}
+                
+                {recentReport.platforms.youtube && (
+                  <tr>
+                    <td>YouTube</td>
+                    <td>
+                      {reportData.filter(d => d.youtube !== null).length > 0 ? 
+                        (reportData.reduce((sum, point) => point.youtube !== null ? sum + point.youtube : sum, 0) / 
+                        reportData.filter(d => d.youtube !== null).length).toFixed(1) : 
+                        'N/A'}
+                    </td>
+                    <td>{reportData.filter(d => d.youtube !== null).length}</td>
+                  </tr>
+                )}
+                
+                <tr className="overall-row">
+                  <td>Overall</td>
+                  <td>
+                    {(() => {
+                      let sum = 0;
+                      let count = 0;
+                      
+                      reportData.forEach(point => {
+                        if (point.reddit !== null) { sum += point.reddit; count++; }
+                        if (point.twitter !== null) { sum += point.twitter; count++; }
+                        if (point.youtube !== null) { sum += point.youtube; count++; }
+                      });
+                      
+                      return count > 0 ? (sum / count).toFixed(1) : 'N/A';
+                    })()}
+                  </td>
+                  <td>{(() => {
+                    let count = 0;
+                    reportData.forEach(point => {
+                      if (point.reddit !== null) count++;
+                      if (point.twitter !== null) count++;
+                      if (point.youtube !== null) count++;
+                    });
+                    return count;
+                  })()}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
-          <div className="analytics-section">
-            <h3>Key Community Insights</h3>
-            <div className="insights-container">
-              <div className="insight-card">
-                <h4>Reddit r/{availableCryptos.find(c => c.id === selectedCrypto)?.subreddit || 'unknown'}</h4>
-                <p className="insight-text">Community sentiment has improved by {Math.floor(Math.random() * 10) + 2}% over the past week with increased discussion about new partnerships and development updates.</p>
-                <div className="insight-stats">
-                  <span>{(Math.floor(Math.random() * 15) + 1) / 10}K posts</span>
-                  <span>{(Math.floor(Math.random() * 85) + 15) / 10}K comments</span>
+          {/* Source info */}
+          <div className="source-info">
+            <h3>Data Sources</h3>
+            <div className="source-details">
+              {recentReport.platforms.reddit && (
+                <div className="source-item">
+                  <strong>Reddit:</strong> r/{cryptoDetails?.subreddit || 'N/A'}
                 </div>
-              </div>
-              
-              <div className="insight-card">
-                <h4>Twitter {availableCryptos.find(c => c.id === selectedCrypto)?.hashtag || '#unknown'}</h4>
-                <p className="insight-text">Recent tweets show {sentimentData.overallScore > 60 ? 'high optimism' : sentimentData.overallScore > 45 ? 'mixed reactions' : 'some concerns'} with {availableCryptos.find(c => c.id === selectedCrypto)?.hashtag || '#unknown'} trending in crypto communities. Influencer activity is {Math.random() > 0.5 ? 'up' : 'down'} {Math.floor(Math.random() * 30) + 5}%.</p>
-                <div className="insight-stats">
-                  <span>{(Math.floor(Math.random() * 43) + 10) / 10}K tweets</span>
-                  <span>{(Math.floor(Math.random() * 128) + 30) / 10}K retweets</span>
+              )}
+              {recentReport.platforms.twitter && (
+                <div className="source-item">
+                  <strong>Twitter:</strong> #{cryptoDetails?.hashtag || 'N/A'}
                 </div>
-              </div>
-              
-              <div className="insight-card">
-                <h4>YouTube Analysis</h4>
-                <p className="insight-text">Content creators are predominantly {sentimentData.sources[2].positive > 65 ? 'positive' : sentimentData.sources[2].positive > 50 ? 'optimistic' : 'cautious'} with {sentimentData.sources[2].positive}% of recent videos discussing {sentimentData.overallScore > 60 ? 'bullish signals' : 'technical analysis'} {sentimentData.overallScore > 55 ? 'supporting upward movement' : 'suggesting careful monitoring'}.</p>
-                <div className="insight-stats">
-                  <span>{Math.floor(Math.random() * 300) + 100} videos</span>
-                  <span>{(Math.floor(Math.random() * 20) + 1) / 10}M views</span>
+              )}
+              {recentReport.platforms.youtube && (
+                <div className="source-item">
+                  <strong>YouTube:</strong> {cryptoDetails?.videoLink || 'N/A'}
                 </div>
-              </div>
+              )}
             </div>
           </div>
-
-          <div className="analytics-section">
-            <h3>Top Keywords</h3>
-            <div className="keyword-cloud">
-              <span className="keyword size-xl">bullish</span>
-              <span className="keyword size-l">partnership</span>
-              <span className="keyword size-m">upgrade</span>
-              <span className="keyword size-xl">development</span>
-              <span className="keyword size-s">stake</span>
-              <span className="keyword size-m">adoption</span>
-              <span className="keyword size-l">future</span>
-              <span className="keyword size-s">community</span>
-              <span className="keyword size-m">hodl</span>
-              <span className="keyword size-s">growth</span>
-            </div>
+        </div>
+      ) : (
+        // If no report, show prompt to create one
+        <div className="no-report-view">
+          <div className="no-report-message">
+            {cryptoDetails ? (
+              <>
+                <h3>No sentiment analysis available for {cryptoDetails.cryptoName}</h3>
+                <p>To see sentiment analysis, you need to generate a report first.</p>
+                <div className="crypto-info">
+                  <div className="info-item">
+                    <span className="label">Subreddit:</span>
+                    <span className="value">r/{cryptoDetails.subreddit}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">Twitter Hashtag:</span>
+                    <span className="value">#{cryptoDetails.hashtag}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="label">YouTube Keywords:</span>
+                    <span className="value">{cryptoDetails.videoLink}</span>
+                  </div>
+                </div>
+                <button 
+                  className="create-report-button"
+                  onClick={handleCreateNewAnalysis}
+                >
+                  <Plus size={18} />
+                  Generate Sentiment Report
+                </button>
+              </>
+            ) : (
+              <>
+                <h3>Please select a cryptocurrency</h3>
+                <p>Select a cryptocurrency from the dropdown above to view its sentiment analysis.</p>
+              </>
+            )}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
