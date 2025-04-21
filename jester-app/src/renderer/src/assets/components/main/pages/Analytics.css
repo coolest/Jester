@@ -2,6 +2,17 @@
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  /* Add this to allow proper scrolling */
+  overflow-y: auto;
+  max-height: calc(100vh - 120px); /* Allow space for navbar and padding */
+}
+
+/* Add this wrapper for better content height management */
+.analytics-content-wrapper {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 40px; /* Add padding at the bottom to prevent cutoff */
 }
 
 .analytics-header {
@@ -11,6 +22,12 @@
   margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--background-soft-color);
+  padding: 10px;
+  border-radius: 8px;
 }
 
 .analytics-header h2 {
@@ -71,295 +88,17 @@
   padding: 40px;
   color: var(--text-color);
   font-size: 16px;
-}
-
-.sentiment-overview {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 24px;
-  margin-bottom: 24px;
-}
-
-.overall-sentiment {
-  background-color: var(--background-color);
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  border: 1px solid var(--background-soft-color);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.overall-sentiment h3 {
-  font-size: 18px;
-  color: var(--text-color);
-  margin: 0 0 16px 0;
-  font-weight: 500;
-}
-
-.sentiment-score {
-  font-size: 64px;
-  font-weight: 700;
-  margin: 0;
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
+  gap: 8px;
+  transition: background-color 0.3s;
 }
 
-.sentiment-score.very-positive {
-  background-color: #4caf50;
-  color: white;
+.create-report-button:hover {
+  background-color: var(--purple-fading-soft);
 }
 
-.sentiment-score.positive {
-  background-color: #8bc34a;
-  color: white;
-}
-
-.sentiment-score.neutral {
-  background-color: #ffc107;
-  color: #333;
-}
-
-.sentiment-score.negative {
-  background-color: #ff9800;
-  color: white;
-}
-
-.sentiment-score.very-negative {
-  background-color: #f44336;
-  color: white;
-}
-
-.sentiment-label {
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--text-color);
-}
-
-.sentiment-summary {
-  background-color: var(--background-color);
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  border: 1px solid var(--background-soft-color);
-}
-
-.sentiment-summary h3 {
-  font-size: 18px;
-  color: var(--text-color);
-  margin: 0 0 16px 0;
-  font-weight: 500;
-}
-
-.trend-visualization {
-  display: flex;
-  align-items: flex-end;
-  height: 200px;
-  gap: 12px;
-  padding-bottom: 30px;
-  position: relative;
-}
-
-.trend-day {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100%;
-  position: relative;
-}
-
-.trend-bar {
-  width: 90%;
-  border-radius: 4px 4px 0 0;
-  transition: height 0.5s ease;
-}
-
-.trend-bar.very-positive {
-  background-color: #4caf50;
-}
-
-.trend-bar.positive {
-  background-color: #8bc34a;
-}
-
-.trend-bar.neutral {
-  background-color: #ffc107;
-}
-
-.trend-bar.negative {
-  background-color: #ff9800;
-}
-
-.trend-bar.very-negative {
-  background-color: #f44336;
-}
-
-.trend-date {
-  position: absolute;
-  bottom: -25px;
-  font-size: 12px;
-  color: var(--text-color);
-  transform: rotate(-45deg);
-  transform-origin: top left;
-  white-space: nowrap;
-}
-
-.analytics-section {
-  background-color: var(--background-color);
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  border: 1px solid var(--background-soft-color);
-  margin-bottom: 24px;
-}
-
-.analytics-section h3 {
-  font-size: 18px;
-  color: var(--text-color);
-  margin: 0 0 16px 0;
-  font-weight: 500;
-}
-
-.platform-table table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.platform-table th {
-  text-align: left;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--background-soft-color);
-  color: var(--text-color);
-  font-weight: 500;
-}
-
-.platform-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--background-soft-color);
-  color: var(--text-color);
-}
-
-.platform-table tr:last-child td {
-  border-bottom: none;
-}
-
-.platform-name {
-  font-weight: 500;
-}
-
-.positive {
-  color: #4caf50;
-}
-
-.neutral {
-  color: #ffc107;
-}
-
-.negative {
-  color: #f44336;
-}
-
-.insights-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
-}
-
-.insight-card {
-  background-color: var(--background-soft-color);
-  border-radius: 8px;
-  padding: 16px;
-  border-left: 4px solid var(--purple-fading);
-}
-
-.insight-card h4 {
-  margin: 0 0 12px 0;
-  color: var(--text-color);
-  font-size: 16px;
-}
-
-.insight-text {
-  color: var(--text-color);
-  margin: 0 0 12px 0;
-  line-height: 1.5;
-}
-
-.insight-stats {
-  display: flex;
-  justify-content: space-between;
-  color: var(--text-color);
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-.keyword-cloud {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 16px;
-  justify-content: center;
-}
-
-.keyword {
-  padding: 8px 12px;
-  background-color: var(--purple-fading);
-  border-radius: 20px;
-  color: white;
-  font-weight: 500;
-}
-
-.keyword.size-xl {
-  font-size: 22px;
-  padding: 10px 16px;
-}
-
-.keyword.size-l {
-  font-size: 18px;
-}
-
-.keyword.size-m {
-  font-size: 16px;
-}
-
-.keyword.size-s {
-  font-size: 14px;
-  opacity: 0.9;
-}
-
-@media (max-width: 768px) {
-  .sentiment-overview {
-    grid-template-columns: 1fr;
-  }
-  
-  .analytics-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .timeframe-selector {
-    width: 100%;
-  }
-  
-  .platform-table {
-    overflow-x: auto;
-  }
-  
-  .trend-date {
-    font-size: 10px;
-  }
-}
-
-/* Add these new styles to your Analytics.css file */
-
+/* Analytics actions styling */
 .analytics-title-container {
   display: flex;
   justify-content: space-between;
@@ -388,7 +127,7 @@
 }
 
 .add-analysis-button:hover {
-  background-color: var(--purple-solid);
+  background-color: var(--purple-solid, #5e35b1);
 }
 
 .past-analysis-button {
@@ -408,144 +147,268 @@
   color: white;
 }
 
-/* Add these styles to your Analytics.css file */
-
-/* Report view specific styles */
-.analytics-container .report-details-banner {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px 20px;
-  background-color: var(--app-bg-card);
-  border-radius: 8px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+/* Improved scrollbar styling */
+.analytics-container::-webkit-scrollbar {
+  width: 12px; /* Increased width for better visibility */
 }
 
-.analytics-container .detail-item {
-  display: flex;
-  flex-direction: column;
+.analytics-container::-webkit-scrollbar-track {
+  background: var(--background-color);
+  border-radius: 10px;
 }
 
-.analytics-container .detail-label {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-bottom: 5px;
+.analytics-container::-webkit-scrollbar-thumb {
+  background: var(--purple-fading);
+  border-radius: 10px;
+  border: 3px solid var(--background-color);
 }
 
-.analytics-container .detail-value {
-  font-size: 14px;
-  color: var(--text-primary);
-  font-weight: 500;
+.analytics-container::-webkit-scrollbar-thumb:hover {
+  background: var(--purple-fading-soft);
 }
 
-.analytics-container .platform-badges {
-  display: flex;
-  gap: 8px;
+/* Recharts component style overrides to match theme */
+.recharts-default-tooltip {
+  background-color: var(--background-color) !important;
+  border: 1px solid var(--background-soft-color) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 }
 
-.analytics-container .platform-badge {
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  color: white;
+.recharts-tooltip-label {
+  color: var(--text-color) !important;
 }
 
-.analytics-container .platform-badge.reddit {
-  background-color: #FF4500;
+.recharts-tooltip-item-list {
+  color: var(--text-color) !important;
 }
 
-.analytics-container .platform-badge.twitter {
-  background-color: #1DA1F2;
+.recharts-tooltip-item {
+  color: var(--text-color) !important;
 }
 
-.analytics-container .platform-badge.youtube {
-  background-color: #FF0000;
+.recharts-text.recharts-cartesian-axis-tick-value {
+  fill: var(--text-color) !important;
 }
 
-/* Enlarged chart container for report view */
-.analytics-container .sentiment-chart-container {
-  background-color: var(--app-bg-card);
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.recharts-legend-item-text {
+  color: var(--text-color) !important;
 }
 
-.analytics-container .sentiment-chart-container h3 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 18px;
-  color: var(--text-primary);
+/* Make sure report visualization has enough space */
+.report-visualization {
+  padding-bottom: 50px; /* Ensure enough space at the bottom */
 }
 
-.analytics-container .sentiment-chart {
-  height: 500px;
-  background-color: var(--app-bg);
-  border-radius: 8px;
-  padding: 15px;
-}
-
-/* Export buttons for report view */
-.analytics-container .export-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.analytics-container .export-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: var(--app-bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s, box-shadow 0.2s;
-}
-
-.analytics-container .export-button:hover {
-  background-color: var(--app-bg-hover);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.analytics-container .back-button {
-  display: flex;
-  align-items: center;
-  background-color: var(--app-bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-left: 10px;
-  transition: background-color 0.2s;
-}
-
-.analytics-container .back-button:hover {
-  background-color: var(--app-bg-hover);
-}
-
-/* Responsive adjustments */
+/* Make sure there's spacing between header items on smaller screens */
 @media (max-width: 768px) {
-  .analytics-container .report-details-banner {
+  .analytics-header {
     flex-direction: column;
-    gap: 10px;
+    align-items: flex-start;
   }
   
-  .analytics-container .export-actions {
-    flex-direction: column;
-    gap: 5px;
+  .crypto-selector {
+    width: 100%;
   }
   
-  .analytics-container .analytics-actions {
+  .analytics-title-container {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  
-  .analytics-container .back-button {
-    margin-left: 0;
-    margin-top: 10px;
-  }
+}
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin: auto;
+}
+
+.spinning {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(244, 67, 54, 0.1);
+  color: var(--red);
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+/* Chart styling improvements */
+.chart-container {
+  background-color: var(--background-color);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--background-soft-color);
+  margin-bottom: 24px;
+}
+
+/* Custom tooltip styling to match app theme */
+.custom-tooltip {
+  background-color: var(--background-color);
+  border: 1px solid var(--background-soft-color);
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: var(--text-color);
+  min-width: 150px;
+}
+
+.tooltip-date {
+  font-weight: 500;
+  margin: 0 0 8px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--background-soft-color);
+  color: var(--text-color);
+}
+
+.tooltip-data {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tooltip-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tooltip-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.tooltip-name {
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.tooltip-value {
+  font-weight: 400;
+}
+
+/* Styling for statistics table */
+.platform-statistics {
+  background-color: var(--background-color);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--background-soft-color);
+  margin-bottom: 24px;
+}
+
+.statistics-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.statistics-table th {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--background-soft-color);
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.statistics-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--background-soft-color);
+  color: var(--text-color);
+}
+
+.statistics-table tr:last-child td {
+  border-bottom: none;
+}
+
+.statistics-table .overall-row {
+  font-weight: 500;
+  background-color: rgba(var(--purple-fading-rgb), 0.1);
+}
+
+/* Source info styling */
+.source-info {
+  background-color: var(--background-color);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--background-soft-color);
+  margin-bottom: 24px;
+}
+
+.source-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.source-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--background-soft-color);
+  border-radius: 6px;
+}
+
+/* No report view styling */
+.no-report-view {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  flex: 1;
+}
+
+.no-report-message {
+  text-align: center;
+  max-width: 500px;
+  background-color: var(--background-color);
+  border-radius: 8px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--background-soft-color);
+}
+
+.crypto-info {
+  margin: 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--background-soft-color);
+  border-radius: 6px;
+}
+
+.info-item .label {
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.create-report-button {
+  background-color: var(--purple-fading);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
 }

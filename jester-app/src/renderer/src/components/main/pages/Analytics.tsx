@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../../assets/components/main/pages/Analytics.css';
-import { Plus, BarChart2, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Plus, BarChart2, RefreshCw, AlertTriangle, ArrowLeft } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -9,7 +9,8 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
+  TooltipProps
 } from 'recharts';
 
 interface AnalyticsProps {
@@ -33,7 +34,7 @@ interface SentimentDataPoint {
   twitter: number | null;
   youtube: number | null;
   formattedDate?: string;
-  average?: number;
+  average?: number | null;
 }
 
 interface Report {
@@ -54,6 +55,29 @@ interface Report {
   resultFilePath: string;
   createdAt: string;
 }
+
+// Custom tooltip component that matches the app's dark theme
+const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="custom-tooltip">
+        <p className="tooltip-date">{label}</p>
+        <div className="tooltip-data">
+          {payload.map((entry, index) => (
+            entry.value !== null && (
+              <div key={`tooltip-${index}`} className="tooltip-item">
+                <div className="tooltip-color" style={{ backgroundColor: entry.color }}></div>
+                <span className="tooltip-name">{entry.name}:</span>
+                <span className="tooltip-value">{entry.value?.toFixed(1)}</span>
+              </div>
+            )
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 const Analytics: React.FC<AnalyticsProps> = ({ 
   selectedCryptoId,
@@ -151,7 +175,7 @@ const Analytics: React.FC<AnalyticsProps> = ({
     loadRecentReport();
   }, [selectedCrypto]);
 
-  // Load report data
+  // Load report data with improved data handling
   const loadReportData = async (reportId: string) => {
     try {
       const result = await window.api.getReportById(reportId);
@@ -163,18 +187,20 @@ const Analytics: React.FC<AnalyticsProps> = ({
           const date = new Date(item.timestamp * 1000);
           const formattedDate = `${date.getMonth() + 1}/${date.getDate()}`;
           
-          // Calculate average for this point
-          const values: any[] = [];
-          if (item.reddit !== null) values.push(item.reddit);
-          if (item.twitter !== null) values.push(item.twitter);
-          if (item.youtube !== null) values.push(item.youtube);
+          // Ensure values are properly typed numbers or null
+          const redditValue = typeof item.reddit === 'number' ? item.reddit : null;
+          const twitterValue = typeof item.twitter === 'number' ? item.twitter : null;
+          const youtubeValue = typeof item.youtube === 'number' ? item.youtube : null;
+          
+          // Calculate average only for non-null values
+          const values = [redditValue, twitterValue, youtubeValue].filter(v => v !== null) as number[];
           const average = values.length > 0 ? values.reduce((sum, val) => sum + val, 0) / values.length : null;
           
           return {
             timestamp: item.timestamp,
-            reddit: typeof item.reddit === 'number' ? item.reddit : null,
-            twitter: typeof item.twitter === 'number' ? item.twitter : null,
-            youtube: typeof item.youtube === 'number' ? item.youtube : null,
+            reddit: redditValue,
+            twitter: twitterValue,
+            youtube: youtubeValue,
             formattedDate,
             average
           };
@@ -183,6 +209,7 @@ const Analytics: React.FC<AnalyticsProps> = ({
         // Sort by timestamp (oldest to newest)
         formattedData.sort((a, b) => a.timestamp - b.timestamp);
         
+        console.log('Processed report data:', formattedData);
         setReportData(formattedData);
         setIsLoading(false);
         return true;
@@ -228,6 +255,36 @@ const Analytics: React.FC<AnalyticsProps> = ({
   const formatDate = (timestamp: string | number) => {
     const ts = typeof timestamp === 'string' ? parseInt(timestamp) : timestamp;
     return new Date(ts * 1000).toLocaleDateString();
+  };
+
+  // Calculate platform average
+  const calculatePlatformAverage = (platform: 'reddit' | 'twitter' | 'youtube') => {
+    if (!reportData) return 'N/A';
+    
+    const values = reportData
+      .map(point => point[platform])
+      .filter(value => value !== null) as number[];
+    
+    if (values.length === 0) return 'N/A';
+    
+    const average = values.reduce((sum, value) => sum + value, 0) / values.length;
+    return average.toFixed(1);
+  };
+
+  // Calculate overall average
+  const calculateOverallAverage = () => {
+    if (!reportData) return 'N/A';
+    
+    let sum = 0;
+    let count = 0;
+    
+    reportData.forEach(point => {
+      if (point.reddit !== null) { sum += point.reddit; count++; }
+      if (point.twitter !== null) { sum += point.twitter; count++; }
+      if (point.youtube !== null) { sum += point.youtube; count++; }
+    });
+    
+    return count > 0 ? (sum / count).toFixed(1) : 'N/A';
   };
 
   return (
@@ -281,226 +338,217 @@ const Analytics: React.FC<AnalyticsProps> = ({
         </div>
       )}
 
-      {isLoading ? (
-        <div className="loading-indicator">
-          <RefreshCw size={24} className="spinning" />
-          <span>Loading sentiment data...</span>
-        </div>
-      ) : recentReport && reportData && reportData.length > 0 ? (
-        // Show data visualization if we have report data
-        <div className="report-visualization">
-          <div className="report-info">
-            <h3>{recentReport.reportName}</h3>
-            <div className="report-date-range">
-              {formatDate(recentReport.timeRange.startDate)} - {formatDate(recentReport.timeRange.endDate)}
+      <div className="analytics-content-wrapper">
+        {isLoading ? (
+          <div className="loading-indicator">
+            <RefreshCw size={24} className="spinning" />
+            <span>Loading sentiment data...</span>
+          </div>
+        ) : recentReport && reportData && reportData.length > 0 ? (
+          // Show data visualization if we have report data
+          <div className="report-visualization">
+            <div className="report-info">
+              <h3>{recentReport.reportName}</h3>
+              <div className="report-date-range">
+                {formatDate(recentReport.timeRange.startDate)} - {formatDate(recentReport.timeRange.endDate)}
+              </div>
             </div>
-          </div>
 
-          {/* Main Chart */}
-          <div className="chart-container">
-            <h3>Sentiment Trends</h3>
-            <ResponsiveContainer width="100%" height={400}>
-              <LineChart
-                data={reportData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="formattedDate" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip 
-                  formatter={(value: any) => [value ? value.toFixed(1) : 'N/A', '']}
-                  labelFormatter={(label: string) => `Date: ${label}`}
-                />
-                <Legend />
-                
-                {recentReport.platforms.reddit && (
-                  <Line
-                    type="monotone"
-                    dataKey="reddit"
-                    name="Reddit"
-                    stroke={getStrokeColor('reddit')}
-                    activeDot={{ r: 8 }}
-                    connectNulls
-                  />
-                )}
-                
-                {recentReport.platforms.twitter && (
-                  <Line
-                    type="monotone"
-                    dataKey="twitter"
-                    name="Twitter"
-                    stroke={getStrokeColor('twitter')}
-                    activeDot={{ r: 8 }}
-                    connectNulls
-                  />
-                )}
-                
-                {recentReport.platforms.youtube && (
-                  <Line
-                    type="monotone"
-                    dataKey="youtube"
-                    name="YouTube"
-                    stroke={getStrokeColor('youtube')}
-                    activeDot={{ r: 8 }}
-                    connectNulls
-                  />
-                )}
-                
-                <Line
-                  type="monotone"
-                  dataKey="average"
-                  name="Average"
-                  stroke={getStrokeColor('average')}
-                  strokeWidth={2}
-                  activeDot={{ r: 8 }}
-                  connectNulls
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Platform statistics table */}
-          <div className="platform-statistics">
-            <h3>Platform Sentiment</h3>
-            <table className="statistics-table">
-              <thead>
-                <tr>
-                  <th>Platform</th>
-                  <th>Average Sentiment</th>
-                  <th>Data Points</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentReport.platforms.reddit && (
-                  <tr>
-                    <td>Reddit</td>
-                    <td>
-                      {reportData.filter(d => d.reddit !== null).length > 0 ? 
-                        (reportData.reduce((sum, point) => point.reddit !== null ? sum + point.reddit : sum, 0) / 
-                        reportData.filter(d => d.reddit !== null).length).toFixed(1) : 
-                        'N/A'}
-                    </td>
-                    <td>{reportData.filter(d => d.reddit !== null).length}</td>
-                  </tr>
-                )}
-                
-                {recentReport.platforms.twitter && (
-                  <tr>
-                    <td>Twitter</td>
-                    <td>
-                      {reportData.filter(d => d.twitter !== null).length > 0 ? 
-                        (reportData.reduce((sum, point) => point.twitter !== null ? sum + point.twitter : sum, 0) / 
-                        reportData.filter(d => d.twitter !== null).length).toFixed(1) : 
-                        'N/A'}
-                    </td>
-                    <td>{reportData.filter(d => d.twitter !== null).length}</td>
-                  </tr>
-                )}
-                
-                {recentReport.platforms.youtube && (
-                  <tr>
-                    <td>YouTube</td>
-                    <td>
-                      {reportData.filter(d => d.youtube !== null).length > 0 ? 
-                        (reportData.reduce((sum, point) => point.youtube !== null ? sum + point.youtube : sum, 0) / 
-                        reportData.filter(d => d.youtube !== null).length).toFixed(1) : 
-                        'N/A'}
-                    </td>
-                    <td>{reportData.filter(d => d.youtube !== null).length}</td>
-                  </tr>
-                )}
-                
-                <tr className="overall-row">
-                  <td>Overall</td>
-                  <td>
-                    {(() => {
-                      let sum = 0;
-                      let count = 0;
-                      
-                      reportData.forEach(point => {
-                        if (point.reddit !== null) { sum += point.reddit; count++; }
-                        if (point.twitter !== null) { sum += point.twitter; count++; }
-                        if (point.youtube !== null) { sum += point.youtube; count++; }
-                      });
-                      
-                      return count > 0 ? (sum / count).toFixed(1) : 'N/A';
-                    })()}
-                  </td>
-                  <td>{(() => {
-                    let count = 0;
-                    reportData.forEach(point => {
-                      if (point.reddit !== null) count++;
-                      if (point.twitter !== null) count++;
-                      if (point.youtube !== null) count++;
-                    });
-                    return count;
-                  })()}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          {/* Source info */}
-          <div className="source-info">
-            <h3>Data Sources</h3>
-            <div className="source-details">
-              {recentReport.platforms.reddit && (
-                <div className="source-item">
-                  <strong>Reddit:</strong> r/{cryptoDetails?.subreddit || 'N/A'}
-                </div>
-              )}
-              {recentReport.platforms.twitter && (
-                <div className="source-item">
-                  <strong>Twitter:</strong> #{cryptoDetails?.hashtag || 'N/A'}
-                </div>
-              )}
-              {recentReport.platforms.youtube && (
-                <div className="source-item">
-                  <strong>YouTube:</strong> {cryptoDetails?.videoLink || 'N/A'}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      ) : (
-        // If no report, show prompt to create one
-        <div className="no-report-view">
-          <div className="no-report-message">
-            {cryptoDetails ? (
-              <>
-                <h3>No sentiment analysis available for {cryptoDetails.cryptoName}</h3>
-                <p>To see sentiment analysis, you need to generate a report first.</p>
-                <div className="crypto-info">
-                  <div className="info-item">
-                    <span className="label">Subreddit:</span>
-                    <span className="value">r/{cryptoDetails.subreddit}</span>
-                  </div>
-                  <div className="info-item">
-                    <span className="label">Twitter Hashtag:</span>
-                    <span className="value">#{cryptoDetails.hashtag}</span>
-                  </div>
-                  <div className="info-item">
-                    <span className="label">YouTube Keywords:</span>
-                    <span className="value">{cryptoDetails.videoLink}</span>
-                  </div>
-                </div>
-                <button 
-                  className="create-report-button"
-                  onClick={handleCreateNewAnalysis}
+            {/* Main Chart */}
+            <div className="chart-container">
+              <h3>Sentiment Trends</h3>
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart
+                  data={reportData}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                 >
-                  <Plus size={18} />
-                  Generate Sentiment Report
-                </button>
-              </>
-            ) : (
-              <>
-                <h3>Please select a cryptocurrency</h3>
-                <p>Select a cryptocurrency from the dropdown above to view its sentiment analysis.</p>
-              </>
-            )}
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
+                  <XAxis 
+                    dataKey="formattedDate" 
+                    stroke="var(--text-color)"
+                    tick={{ fill: 'var(--text-color)' }}
+                  />
+                  <YAxis 
+                    domain={[0, 100]} 
+                    stroke="var(--text-color)"
+                    tick={{ fill: 'var(--text-color)' }}
+                  />
+                  <Tooltip 
+                    content={<CustomTooltip />}
+                  />
+                  <Legend 
+                    wrapperStyle={{ color: 'var(--text-color)' }}
+                  />
+                  
+                  {/* Only render lines for platforms that are enabled in the report */}
+                  {recentReport.platforms.reddit && (
+                    <Line
+                      type="monotone"
+                      dataKey="reddit"
+                      name="Reddit"
+                      stroke={getStrokeColor('reddit')}
+                      activeDot={{ r: 8 }}
+                      connectNulls
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                    />
+                  )}
+                  
+                  {recentReport.platforms.twitter && (
+                    <Line
+                      type="monotone"
+                      dataKey="twitter"
+                      name="Twitter"
+                      stroke={getStrokeColor('twitter')}
+                      activeDot={{ r: 8 }}
+                      connectNulls
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                    />
+                  )}
+                  
+                  {recentReport.platforms.youtube && (
+                    <Line
+                      type="monotone"
+                      dataKey="youtube"
+                      name="YouTube"
+                      stroke={getStrokeColor('youtube')}
+                      activeDot={{ r: 8 }}
+                      connectNulls
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                    />
+                  )}
+                  
+                  <Line
+                    type="monotone"
+                    dataKey="average"
+                    name="Average"
+                    stroke={getStrokeColor('average')}
+                    strokeWidth={3}
+                    activeDot={{ r: 8 }}
+                    connectNulls
+                    dot={{ r: 4 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Platform statistics table */}
+            <div className="platform-statistics">
+              <h3>Platform Sentiment</h3>
+              <table className="statistics-table">
+                <thead>
+                  <tr>
+                    <th>Platform</th>
+                    <th>Average Sentiment</th>
+                    <th>Data Points</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentReport.platforms.reddit && (
+                    <tr>
+                      <td>Reddit</td>
+                      <td>{calculatePlatformAverage('reddit')}</td>
+                      <td>{reportData.filter(d => d.reddit !== null).length}</td>
+                    </tr>
+                  )}
+                  
+                  {recentReport.platforms.twitter && (
+                    <tr>
+                      <td>Twitter</td>
+                      <td>{calculatePlatformAverage('twitter')}</td>
+                      <td>{reportData.filter(d => d.twitter !== null).length}</td>
+                    </tr>
+                  )}
+                  
+                  {recentReport.platforms.youtube && (
+                    <tr>
+                      <td>YouTube</td>
+                      <td>{calculatePlatformAverage('youtube')}</td>
+                      <td>{reportData.filter(d => d.youtube !== null).length}</td>
+                    </tr>
+                  )}
+                  
+                  <tr className="overall-row">
+                    <td>Overall</td>
+                    <td>{calculateOverallAverage()}</td>
+                    <td>{(() => {
+                      let count = 0;
+                      reportData.forEach(point => {
+                        if (point.reddit !== null) count++;
+                        if (point.twitter !== null) count++;
+                        if (point.youtube !== null) count++;
+                      });
+                      return count;
+                    })()}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Source info */}
+            <div className="source-info">
+              <h3>Data Sources</h3>
+              <div className="source-details">
+                {recentReport.platforms.reddit && (
+                  <div className="source-item">
+                    <strong>Reddit:</strong> r/{cryptoDetails?.subreddit || 'N/A'}
+                  </div>
+                )}
+                {recentReport.platforms.twitter && (
+                  <div className="source-item">
+                    <strong>Twitter:</strong> #{cryptoDetails?.hashtag || 'N/A'}
+                  </div>
+                )}
+                {recentReport.platforms.youtube && (
+                  <div className="source-item">
+                    <strong>YouTube:</strong> {cryptoDetails?.videoLink || 'N/A'}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        ) : (
+          // If no report, show prompt to create one
+          <div className="no-report-view">
+            <div className="no-report-message">
+              {cryptoDetails ? (
+                <>
+                  <h3>No sentiment analysis available for {cryptoDetails.cryptoName}</h3>
+                  <p>To see sentiment analysis, you need to generate a report first.</p>
+                  <div className="crypto-info">
+                    <div className="info-item">
+                      <span className="label">Subreddit:</span>
+                      <span className="value">r/{cryptoDetails.subreddit}</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="label">Twitter Hashtag:</span>
+                      <span className="value">#{cryptoDetails.hashtag}</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="label">YouTube Keywords:</span>
+                      <span className="value">{cryptoDetails.videoLink}</span>
+                    </div>
+                  </div>
+                  <button 
+                    className="create-report-button"
+                    onClick={handleCreateNewAnalysis}
+                  >
+                    <Plus size={18} />
+                    Generate Sentiment Report
+                  </button>
+                </>
+              ) : (
+                <>
+                  <h3>Please select a cryptocurrency</h3>
+                  <p>Select a cryptocurrency from the dropdown above to view its sentiment analysis.</p>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
