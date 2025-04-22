@@ -241,7 +241,7 @@ const Analytics: React.FC<AnalyticsProps> = ({
   const getStrokeColor = (platform: string) => {
     switch (platform) {
       case 'reddit':
-        return '#FF4500'; // Reddit orange
+        return '#FFD580'; // Reddit orange
       case 'twitter':
         return '#1DA1F2'; // Twitter blue
       case 'youtube':
