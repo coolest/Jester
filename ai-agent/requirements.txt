@@ -1,0 +1,8 @@
+transformers
+hf_xet
+torch
+scipy
+sympy
+langchain
+langchain-ollama
+accelerate
