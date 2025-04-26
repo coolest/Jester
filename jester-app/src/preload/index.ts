@@ -23,7 +23,15 @@ const api = {
   testRedditConnection: (credentials) => ipcRenderer.invoke('test-reddit-connection', credentials),
   testTwitterConnection: (credentials) => ipcRenderer.invoke('test-twitter-connection', credentials),
   testYoutubeConnection: (credentials) => ipcRenderer.invoke('test-youtube-connection', credentials),
-  testDatabaseConnection: () => ipcRenderer.invoke('test-database-connection')
+  testDatabaseConnection: () => ipcRenderer.invoke('test-database-connection'),
+
+  // Report management methods
+  createReport: (reportData) => ipcRenderer.invoke('create-report', reportData),
+  getAllReports: () => ipcRenderer.invoke('get-reports'),
+  getReportById: (reportId) => ipcRenderer.invoke('get-report', reportId),
+  cancelReport: (reportId) => ipcRenderer.invoke('cancel-report', reportId),
+  deleteReport: (reportId) => ipcRenderer.invoke('delete-report', reportId),
+  getReportLog: (reportId) => ipcRenderer.invoke('get-report-log', reportId)
 }
 
 console.log('Preload script running')

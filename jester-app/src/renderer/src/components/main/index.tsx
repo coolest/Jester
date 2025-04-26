@@ -7,6 +7,8 @@ import CryptoList from './cryptoList/cryptoList'
 import Dashboard from './pages/Dashboard'
 import Analytics from './pages/Analytics'
 import Settings from './pages/Settings'
+import NewReport from './pages/newReport' // Import the NewReport component
+import Reports from './pages/Reports';
 
 // Shared interface for sidebar data
 interface SidebarItem {
@@ -36,6 +38,7 @@ export const Main: React.FC = () => {
     setRefreshTrigger(prev => prev + 1)
   }
 
+  // Shared navigation handler for all components
   const handleNavigate = (route: string) => {
     setCurrentPage(route)
   }
@@ -69,7 +72,6 @@ export const Main: React.FC = () => {
         console.error('Error loading cryptos for sidebar:', error)
       }
     }
-
     loadCryptosForSidebar()
   }, [refreshTrigger, selectedCryptoId])
 
@@ -83,9 +85,13 @@ export const Main: React.FC = () => {
           </>
         )
       case 'analytics':
-        return <Analytics selectedCryptoId={selectedCryptoId} />
+        return <Analytics selectedCryptoId={selectedCryptoId} onNavigate={handleNavigate} />
       case 'settings':
         return <Settings />
+      case 'newReport':
+        return <NewReport onNavigate={handleNavigate} />
+      case 'reports':
+        return <Reports onNavigate={handleNavigate} />
       default:
         return (
           <>

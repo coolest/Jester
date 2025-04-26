@@ -2,6 +2,8 @@
   padding: 20px;
   max-width: 900px;
   margin: 0 auto;
+  color: #e0e0e0;
+  background-color: #121212;
 }
 
 .settings-header {
@@ -10,7 +12,7 @@
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  border-bottom: 1px solid var(--border-color, #383838);
 }
 
 .statistics-badge {
@@ -23,7 +25,7 @@
 }
 
 .save-status-message {
-  background-color: var(--success-color, #4caf50);
+  background-color: var(--success-color, #2e7d32);
   color: white;
   padding: 10px 15px;
   border-radius: 4px;
@@ -41,7 +43,7 @@
   display: flex;
   gap: 5px;
   margin-bottom: 20px;
-  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  border-bottom: 1px solid var(--border-color, #383838);
   overflow-x: auto;
 }
 
@@ -52,7 +54,7 @@
   border-bottom: 3px solid transparent;
   cursor: pointer;
   font-weight: 500;
-  color: var(--text-color, #333);
+  color: var(--text-color, #e0e0e0);
   white-space: nowrap;
 }
 
@@ -62,28 +64,28 @@
 }
 
 .settings-tabs button:hover:not(.active) {
-  background-color: var(--hover-color, #f5f5f5);
+  background-color: var(--hover-color, #2c2c2c);
 }
 
 .settings-section {
-  background-color: var(--bg-card, white);
+  background-color: var(--bg-card, #1e1e1e);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 24px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .settings-section h3 {
   margin-top: 0;
   margin-bottom: 16px;
-  color: var(--heading-color, #333);
+  color: var(--heading-color, #e0e0e0);
   font-size: 18px;
   font-weight: 600;
 }
 
 .auth-description {
   margin-bottom: 20px;
-  color: var(--text-secondary, #666);
+  color: var(--text-secondary, #b0b0b0);
 }
 
 .auth-description p {
@@ -108,7 +110,7 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: var(--text-color, #333);
+  color: var(--text-color, #e0e0e0);
 }
 
 .setting-group input[type="text"],
@@ -117,9 +119,11 @@
 .setting-group select {
   width: 100%;
   padding: 10px;
-  border: 1px solid var(--input-border, #ddd);
+  border: 1px solid var(--input-border, #444);
   border-radius: 4px;
   font-size: 14px;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
 }
 
 .setting-group input[type="number"] {
@@ -128,7 +132,7 @@
 
 .setting-description {
   margin-top: 6px;
-  color: var(--text-secondary, #666);
+  color: var(--text-secondary, #a0a0a0);
   font-size: 13px;
 }
 
@@ -150,7 +154,7 @@
   margin-top: 10px;
   margin-bottom: 15px;
   padding-left: 10px;
-  border-left: 2px solid var(--border-color, #e0e0e0);
+  border-left: 2px solid var(--border-color, #444);
 }
 
 .api-key-display,
@@ -162,19 +166,22 @@
 .api-key-display input,
 .password-display input {
   flex: 1;
+  background-color: #2a2a2a;
+  color: #e0e0e0;
 }
 
 .toggle-visibility {
-  background-color: var(--accent-secondary, #f0f0f0);
+  background-color: var(--accent-secondary, #333);
   border: none;
   border-radius: 4px;
   padding: 0 15px;
   cursor: pointer;
   white-space: nowrap;
+  color: #e0e0e0;
 }
 
 .toggle-visibility:hover {
-  background-color: var(--accent-hover, #e0e0e0);
+  background-color: var(--accent-hover, #444);
 }
 
 .file-upload {
@@ -199,7 +206,8 @@
 .selected-file {
   flex: 1;
   padding: 10px;
-  background-color: var(--bg-light, #f5f5f5);
+  background-color: var(--bg-light, #2a2a2a);
+  color: #e0e0e0;
   border-radius: 4px;
   white-space: nowrap;
   overflow: hidden;
@@ -211,15 +219,16 @@
 }
 
 .test-connection-button {
-  background-color: var(--accent-secondary, #f0f0f0);
-  border: 1px solid var(--border-color, #ddd);
+  background-color: var(--accent-secondary, #333);
+  border: 1px solid var(--border-color, #444);
   border-radius: 4px;
   padding: 10px 15px;
   cursor: pointer;
+  color: #e0e0e0;
 }
 
 .test-connection-button:hover:not(:disabled) {
-  background-color: var(--accent-hover, #e0e0e0);
+  background-color: var(--accent-hover, #444);
 }
 
 .test-connection-button:disabled {
@@ -250,21 +259,22 @@
 
 .reset-button {
   flex: 1;
-  background-color: var(--bg-light, #f5f5f5);
-  border: 1px solid var(--border-color, #ddd);
+  background-color: var(--bg-light, #2a2a2a);
+  border: 1px solid var(--border-color, #444);
   border-radius: 4px;
   padding: 12px 20px;
   cursor: pointer;
   font-weight: 500;
+  color: #e0e0e0;
 }
 
 .reset-button:hover {
-  background-color: var(--accent-secondary, #e0e0e0);
+  background-color: var(--accent-secondary, #333);
 }
 
 .danger-zone {
   border: 1px solid var(--danger-color, #f44336);
-  background-color: var(--danger-bg, #fff8f8);
+  background-color: var(--danger-bg, #2c1d1d);
 }
 
 .danger-zone h3 {
@@ -286,20 +296,21 @@
 }
 
 .danger-info {
-  color: var(--danger-text, #d32f2f);
+  color: var(--danger-text, #ff6b6b);
   font-size: 13px;
   margin-top: 10px;
 }
 
 .generate-key-button {
   margin-top: 8px;
-  background-color: var(--accent-secondary, #f0f0f0);
-  border: 1px solid var(--border-color, #ddd);
+  background-color: var(--accent-secondary, #333);
+  border: 1px solid var(--border-color, #444);
   border-radius: 4px;
   padding: 8px 12px;
   cursor: pointer;
+  color: #e0e0e0;
 }
 
 .generate-key-button:hover {
-  background-color: var(--accent-hover, #e0e0e0);
+  background-color: var(--accent-hover, #444);
 }

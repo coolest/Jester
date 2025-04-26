@@ -23,8 +23,15 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
+    "chokidar": "^4.0.3",
+    "dotenv": "^16.5.0",
     "electron-store": "^10.0.1",
-    "lucide-react": "^0.482.0"
+    "googleapis": "^148.0.0",
+    "lucide-react": "^0.482.0",
+    "recharts": "^2.15.2",
+    "snoowrap": "^1.23.0",
+    "twitter-api-v2": "^1.22.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",

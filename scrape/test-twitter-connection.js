@@ -1,4 +1,4 @@
-const tweepy = require('tweepy');
+const { TwitterApi } = require('twitter-api-v2');
 const dotenv = require('dotenv');
 const fs = require('fs');
 
@@ -21,28 +21,28 @@ if (envFilePath && fs.existsSync(envFilePath)) {
 
 async function testTwitterConnection() {
   // Get credentials from environment variables
-  const consumer_key = process.env.X_API_KEY;
-  const consumer_secret = process.env.X_API_KEY_SECRET;
-  const access_token = process.env.X_ACCESS_TOKEN;
-  const access_token_secret = process.env.X_ACCESS_TOKEN_SECRET;
+  const apiKey = process.env.X_API_KEY;
+  const apiKeySecret = process.env.X_API_KEY_SECRET;
+  const accessToken = process.env.X_ACCESS_TOKEN;
+  const accessTokenSecret = process.env.X_ACCESS_TOKEN_SECRET;
   
   // Check if all required credentials are present
-  if (!consumer_key || !consumer_secret || !access_token || !access_token_secret) {
+  if (!apiKey || !apiKeySecret || !accessToken || !accessTokenSecret) {
     throw new Error("Missing required Twitter API credentials in environment variables");
   }
   
   try {
-    // Create Twitter client
-    const auth = new tweepy.OAuth1UserHandler(
-      consumer_key, consumer_secret,
-      access_token, access_token_secret
-    );
-    
-    const api = new tweepy.API(auth);
+    // Create Twitter client using twitter-api-v2
+    const twitterClient = new TwitterApi({
+      appKey: apiKey,
+      appSecret: apiKeySecret,
+      accessToken: accessToken,
+      accessSecret: accessTokenSecret,
+    });
     
     // Test connection by verifying credentials
-    const user = await api.verify_credentials();
-    console.log(`Connection successful! Authenticated as @${user.screen_name}`);
+    const currentUser = await twitterClient.v2.me();
+    console.log(`Connection successful! Authenticated as @${currentUser.data.username}`);
     return true;
   } catch (error) {
     console.error(`Twitter connection failed: ${error.message}`);

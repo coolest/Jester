@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../../../assets/components/main/header/NavBar.css';
-import { Home, PieChart, Settings, Bell, HelpCircle } from 'lucide-react';
+import { Home, PieChart, Settings, Bell, HelpCircle, FileText, Files } from 'lucide-react';
 
 interface NavBarProps {
   onNavigate?: (route: string) => void;
@@ -40,6 +40,14 @@ const NavBar: React.FC<NavBarProps> = ({
         </div>
         
         <div 
+          className={`navbar-item ${activeItem === 'reports' ? 'active' : ''}`}
+          onClick={() => handleNavigation('reports')}
+        >
+          <Files size={20} />
+          <span>Reports</span>
+        </div>
+
+        <div 
           className={`navbar-item ${activeItem === 'settings' ? 'active' : ''}`}
           onClick={() => handleNavigation('settings')}
         >
@@ -49,6 +57,14 @@ const NavBar: React.FC<NavBarProps> = ({
       </div>
       
       <div className="navbar-actions">
+        <div 
+          className={`navbar-item new-report ${activeItem === 'newReport' ? 'active' : ''}`}
+          onClick={() => handleNavigation('newReport')}
+        >
+          <FileText size={20} />
+          <span>New Report</span>
+        </div>
+        
         <div className="navbar-item notification">
           <Bell size={20} />
         </div>
