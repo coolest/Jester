@@ -37,14 +37,14 @@ describe('SideBar Component', () => {
     render(<SideBar data={mockData} onItemClick={mockOnItemClick} />);
     
     // Click on the first button
-    fireEvent.click(screen.getByText('BTC - 25').closest('.button-wrapper'));
-    
+    fireEvent.click(screen.getByText('BTC'));
+
     // Check if onItemClick was called with correct ID
     expect(mockOnItemClick).toHaveBeenCalledWith('1');
     
     // Click on the second button
-    fireEvent.click(screen.getByText('ETH - 35').closest('.button-wrapper'));
-    
+    fireEvent.click(screen.getByText('ETC')); 
+
     // Check if onItemClick was called with correct ID
     expect(mockOnItemClick).toHaveBeenCalledWith('2');
   });
@@ -65,8 +65,7 @@ describe('SideBar Component', () => {
     render(<SideBar data={mockData} />);
     
     // Clicking a button without onItemClick should not cause errors
-    fireEvent.click(screen.getByText('BTC - 25').closest('.button-wrapper'));
-    
+  fireEvent.click(screen.getByText('BTC - 25').closest('.button-wrapper')!);    
     // Test passes if no error is thrown
   });
 });
