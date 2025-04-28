@@ -8,6 +8,7 @@ def run_sentiment_analysis(input_csv, output_csv):
         raise ValueError("CSV must contain 'post' and 'manual_sentiment_score' columns")
 
     agent = SentimentAgent()
+
     predicted_scores = []
 
     for _, row in df.iterrows():
@@ -30,4 +31,4 @@ def run_sentiment_analysis(input_csv, output_csv):
     print(f"Finished writing to {output_csv}")
 
 if __name__ == "__main__":
-    run_sentiment_analysis("output_sentiment.csv", "raw_npl_results.csv")
+    run_sentiment_analysis("tests/output_sentiment.csv", "tests/agent_results.csv")

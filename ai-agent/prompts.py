@@ -1,89 +1,110 @@
 from langchain_core.prompts import ChatPromptTemplate
 
-# A1 (mood agent)
+# A1 (Mood Agent)
 mood_prompt = ChatPromptTemplate.from_template("""
-Analyze this post's sentiment (-100 to 100 scale, 0=neutral) focusing exclusively on irrealis mood markers:
-- Conditional language (would, could, should, might)
-- Hypothetical statements
-- Speculative phrasing
+Your job is to adjust the given sentiment score to be as accurate as possible.
+The scale ranges from 0 to 100, where:
+- 0-30 = Negative sentiment
+- 31-69 = Neutral/mixed sentiment
+- 70-100 = Positive sentiment
+
+Focus ONLY on irrealis mood markers:
+✓ Conditional language (would, could, should, might)
+✓ Hypothetical statements
+✓ Speculative phrasing
 
 {input}
-CURRENT SCORE: {score}
+Current Score: {score}
 
-RULES:
-1. Adjust the given score from -100 to 100 where >0 = bullish, <0 = bearish to be more accurate
-2. Focus ONLY on irrealis mood markers
-3. Output MUST be exactly one integer between -100 and 100
+Rules:
+1. Output must be exactly one integer between 0 and 100
+2. Only adjust based on irrealis mood markers
+3. If no relevant markers exist, return the original score
 
-OUTPUT:""")
+Adjusted Score:""")
 
-
-# A2 (rhetoric agent)
+# A2 (Rhetoric Agent)
 rhetoric_prompt = ChatPromptTemplate.from_template("""
-Analyze this post's sentiment (-100 to 100 scale, 0=neutral) for hidden meaning:
-- Sarcasm/irony
-- Negative assertions
-- Rhetorical inversions
-- Hyperbole/understatement
+Your job is to adjust the given sentiment score to be as accurate as possible.
+The scale ranges from 0 to 100, where:
+- 0-30 = Negative sentiment
+- 31-69 = Neutral/mixed sentiment
+- 70-100 = Positive sentiment
+
+Focus ONLY on rhetorical devices:
+✓ Sarcasm/irony
+✓ Negative assertions
+✓ Rhetorical inversions
+✓ Hyperbole/understatement
 
 {input}
-CURRENT SCORE: {score}
+Current Score: {score}
 
-RULES:
-1. Adjust the given score from -100 to 100 where >0 = bullish, <0 = bearish to be more accurate
-2. Detect and adjust for rhetorical devices
-3. Output MUST be exactly one integer between -100 and 100
+Rules:
+1. Output must be exactly one integer between 0 and 100
+2. Only adjust based on rhetorical devices
+3. If no relevant devices exist, return the original score""")
 
-OUTPUT:""")
-
-# A3 (dependency agent)
+# A3 (Dependency Agent)
 dependency_prompt = ChatPromptTemplate.from_template("""
-Analyze ONLY the author's direct sentiment (-100 to 100 scale, 0=neutral):
-- Ignore all third-party references
-- Exclude quoted material
-- Focus exclusively on original sentiment
+Your job is to adjust the given sentiment score to be as accurate as possible.
+The scale ranges from 0 to 100, where:
+- 0-30 = Negative sentiment
+- 31-69 = Neutral/mixed sentiment
+- 70-100 = Positive sentiment
+
+Focus ONLY on:
+✓ Author's direct sentiment (ignore quotes/references)
+✓ Original words only
+✓ Primary expression of opinion
 
 {input}
-CURRENT SCORE: {score}
+Current Score: {score}
 
-RULES:
-1. Adjust the given score from -100 to 100 where >0 = bullish, <0 = bearish to be more accurate
-2. Consider ONLY the author's own words
-3. Output MUST be exactly one integer between -100 and 100
+Rules:
+1. Output must be exactly one integer between 0 and 100
+2. Ignore all third-party references
+3. If no direct sentiment exists, return the original score""")
 
-OUTPUT:""")
-
-# A4 (aspect agent)
+# A4 (Aspect Agent)
 aspect_prompt = ChatPromptTemplate.from_template("""
-Analyze sentiment (-100 to 100 scale, 0=neutral) for ONLY the primary entity:
-- Ignore all other mentioned tickers/topics
-- Focus exclusively on the main subject
-- Exclude off-topic sentiment
+Your job is to adjust the given sentiment score to be as accurate as possible.
+The scale ranges from 0 to 100, where:
+- 0-30 = Negative sentiment
+- 31-69 = Neutral/mixed sentiment
+- 70-100 = Positive sentiment
+
+Focus ONLY on:
+✓ Primary entity/topic
+✓ Main subject only (ignore other mentions)
+✓ Core discussion point
 
 {input}
-CURRENT SCORE: {score}
+Current Score: {score}
 
-RULES:
-1. Adjust the given score from -100 to 100 where >0 = bullish, <0 = bearish to be more accurate
-2. Evaluate ONLY the primary entity
-3. Output MUST be exactly one integer between -100 and 100
+Rules:
+1. Output must be exactly one integer between 0 and 100
+2. Ignore all off-topic sentiment
+3. If no clear focus exists, return the original score""")
 
-OUTPUT:""")
-
-# A5 (reference agent)
+# A5 (Reference Agent)
 reference_prompt = ChatPromptTemplate.from_template("""
-Analyze sentiment (-100 to 100 scale, 0=neutral) based on concrete references:
-- Price points
-- Time expressions
-- Quantitative comparisons
-- Factual benchmarks
+Your job is to adjust the given sentiment score to be as accurate as possible.
+The scale ranges from 0 to 100, where:
+- 0-30 = Negative sentiment
+- 31-69 = Neutral/mixed sentiment
+- 70-100 = Positive sentiment
+
+Focus ONLY on concrete references:
+✓ Price points/numbers
+✓ Time expressions
+✓ Quantitative comparisons
+✓ Factual benchmarks
 
 {input}
-CURRENT SCORE: {score}
+Current Score: {score}
 
-RULES:
-1. Adjust the given score from -100 to 100 where >0 = bullish, <0 = bearish to be more accurate
+Rules:
+1. Output must be exactly one integer between 0 and 100
 2. Weight numerical references heavily
-3. Output MUST be exactly one integer between -100 and 100
-
-OUTPUT:""")
+3. If no concrete references exist, return the original score""")
