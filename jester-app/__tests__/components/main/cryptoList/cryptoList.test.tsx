@@ -42,7 +42,10 @@ describe('CryptoList Component', () => {
       testRedditConnection: jest.fn().mockResolvedValue({}),
       testTwitterConnection: jest.fn().mockResolvedValue({}),
       testYoutubeConnection: jest.fn().mockResolvedValue({}),
-      testDatabaseConnection: jest.fn().mockResolvedValue({})
+      testDatabaseConnection: jest.fn().mockResolvedValue({}),
+      getAllReports: jest.fn().mockResolvedValue({ success: true, reports: [] }),
+      getReportById: jest.fn().mockResolvedValue({ success: true, resultData: [] }), 
+      createReport: jest.fn(),     
     };
   });
 

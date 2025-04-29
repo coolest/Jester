@@ -1,5 +1,6 @@
 // Import Jest DOM utilities using CommonJS
 require('@testing-library/jest-dom');
+import React from 'react';
 
 // Add more comprehensive API mocking
 if (!window.api) {
