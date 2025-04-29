@@ -4,5 +4,5 @@ torch
 scipy
 sympy
 langchain
-langchain-ollama
+langchain-openai
 accelerate

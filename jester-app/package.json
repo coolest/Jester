@@ -31,6 +31,7 @@
     "electron-store": "^10.0.1",
     "googleapis": "^148.0.0",
     "lucide-react": "^0.482.0",
+    "native": "^0.3.3",
     "recharts": "^2.15.2",
     "snoowrap": "^1.23.0",
     "twitter-api-v2": "^1.22.0",
