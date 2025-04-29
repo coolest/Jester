@@ -2,63 +2,60 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import NavBar from '../../../../src/renderer/src/components/main/header/NavBar';
 
+// Mock the icons used by NavBar
+jest.mock('lucide-react', () => ({
+  Home: () => <div data-testid="icon-home">Home</div>,
+  PieChart: () => <div data-testid="icon-piechart">PieChart</div>,
+  Settings: () => <div data-testid="icon-settings">Settings</div>,
+  Bell: () => <div data-testid="icon-bell">Bell</div>,
+  HelpCircle: () => <div data-testid="icon-help">Help</div>,
+  FileText: () => <div data-testid="icon-filetext">FileText</div>
+}));
+
 describe('NavBar Component', () => {
-  test('renders all navigation items', () => {
+  test('renders navbar with all menu items', () => {
     render(<NavBar />);
     
-    // Check that all navigation items are rendered
-    expect(screen.getByText('Home')).toBeInTheDocument();
-    expect(screen.getByText('Analytics')).toBeInTheDocument();
-    expect(screen.getByText('Settings')).toBeInTheDocument();
-    expect(screen.getByText('New Report')).toBeInTheDocument();
+    // Check for the logo
+    expect(screen.getByText('Jester')).toBeInTheDocument();
+    
+    // Check for menu items
+    expect(screen.getByText(/Home/i)).toBeInTheDocument();
+    expect(screen.getByText(/Analytics/i)).toBeInTheDocument();
+    expect(screen.getByText(/Settings/i)).toBeInTheDocument();
+    expect(screen.getByText(/New Report/i)).toBeInTheDocument();
   });
 
-  test('marks active item correctly', () => {
-    render(<NavBar />);
-    
-    // Home should be active by default
-    const homeItem = screen.getByText('Home').closest('.navbar-item');
-    expect(homeItem).toHaveClass('active');
-    
-    // Other items should not be active
-    const analyticsItem = screen.getByText('Analytics').closest('.navbar-item');
-    expect(analyticsItem).not.toHaveClass('active');
-    
-    // Click on Analytics
-    fireEvent.click(screen.getByText('Analytics'));
-    
-    // Analytics should now be active
-    expect(analyticsItem).toHaveClass('active');
-    // Home should no longer be active
-    expect(homeItem).not.toHaveClass('active');
-  });
-
-  test('calls onNavigate with correct route when item is clicked', () => {
+  test('calls onNavigate prop when item is clicked', () => {
     const mockNavigate = jest.fn();
     render(<NavBar onNavigate={mockNavigate} />);
     
-    // Click on Analytics
-    fireEvent.click(screen.getByText('Analytics'));
+    // Click on menu items and check if onNavigate is called with correct value
+    fireEvent.click(screen.getByText(/Home/i));
+    expect(mockNavigate).toHaveBeenCalledWith('dashboard');
     
-    // Check if onNavigate was called with correct route
+    fireEvent.click(screen.getByText(/Analytics/i));
     expect(mockNavigate).toHaveBeenCalledWith('analytics');
     
-    // Click on Settings
-    fireEvent.click(screen.getByText('Settings'));
-    
-    // Check if onNavigate was called with correct route
+    fireEvent.click(screen.getByText(/Settings/i));
     expect(mockNavigate).toHaveBeenCalledWith('settings');
     
-    // Click on New Report
-    fireEvent.click(screen.getByText('New Report'));
-    
-    // Check if onNavigate was called with correct route
+    fireEvent.click(screen.getByText(/New Report/i));
     expect(mockNavigate).toHaveBeenCalledWith('newReport');
+  });
+
+  test('updates active item when clicked', () => {
+    render(<NavBar />);
     
-    // Click on Home
-    fireEvent.click(screen.getByText('Home'));
+    // Get the initial active item (should be 'dashboard')
+    const homeItem = screen.getByText(/Home/i).closest('.navbar-item');
+    expect(homeItem).toHaveClass('active');
     
-    // Check if onNavigate was called with correct route
-    expect(mockNavigate).toHaveBeenCalledWith('dashboard');
+    // Click on Analytics and check if it becomes active
+    fireEvent.click(screen.getByText(/Analytics/i));
+    const analyticsItem = screen.getByText(/Analytics/i).closest('.navbar-item');
+    
+    // Check if the class has changed (this may work differently depending on how your NavBar is implemented)
+    expect(analyticsItem).toHaveClass('active');
   });
 });

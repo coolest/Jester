@@ -1,17 +1,19 @@
+// Type definitions for Jest tests
 interface Window {
-    api: {
-      addCrypto: jest.Mock<Promise<any>, [any]>
-      getCryptos: jest.Mock<Promise<any[]>, []>
-      deleteCrypto: jest.Mock<Promise<any>, [string]>
-      getSettings: jest.Mock<Promise<any>, []>
-      saveSettings: jest.Mock<Promise<any>, [any]>
-      getEnvVariables: jest.Mock<Promise<any>, []>
-      updateEnvFile: jest.Mock<Promise<any>, [any]>
-      saveDbAuthFile: jest.Mock<Promise<any>, [any]>
-      checkDbAuthExists: jest.Mock<Promise<boolean>, []>
-      testRedditConnection: jest.Mock<Promise<any>, [any]>
-      testTwitterConnection: jest.Mock<Promise<any>, [any]>
-      testYoutubeConnection: jest.Mock<Promise<any>, [any]>
-      testDatabaseConnection: jest.Mock<Promise<any>, []>
-    }
-  }
+  api: {
+    addCrypto: jest.Mock;
+    getCryptos: jest.Mock;
+    deleteCrypto: jest.Mock;
+    getSettings: jest.Mock;
+    saveSettings: jest.Mock;
+    getEnvVariables: jest.Mock;
+    updateEnvFile: jest.Mock;
+    saveDbAuthFile: jest.Mock;
+    checkDbAuthExists: jest.Mock;
+    testRedditConnection: jest.Mock;
+    testTwitterConnection: jest.Mock;
+    testYoutubeConnection: jest.Mock;
+    testDatabaseConnection: jest.Mock;
+  };
+  electron: any;
+}
